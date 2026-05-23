@@ -3,11 +3,14 @@ import { Link, NavLink } from 'react-router-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useAuth } from '@/context/AuthContext'
 import LoginModal from '@/components/auth/LoginModal'
+import { useToast } from '@/context/ToastContext'
 
 const Header: React.FC = () => {
     const { language, toggleLanguage, t } = useLanguage()
     const { user, isAuthenticated, isAdmin, isStaff, logout } = useAuth()
+    const { showToast } = useToast()
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+    const [dropdownOpen, setDropdownOpen] = useState(false)
 
     const navLinkClass = ({ isActive }: { isActive: boolean }) =>
         `text-[0.95rem] font-medium transition-colors duration-200 relative py-1 hover:text-primary ${
@@ -17,7 +20,7 @@ const Header: React.FC = () => {
         }`
 
     return (
-        <header className="site-header sticky top-0 z-[100] bg-white/95 backdrop-blur-md border-b border-border-color transition-all duration-300">
+        <header className="site-header sticky top-0 z-[100] bg-white/95 backdrop-blur-md transition-all duration-300">
             <div className="header-container max-w-[1400px] mx-auto py-5 px-8 flex justify-between items-center gap-8">
                 <Link to="/" className="logo font-sans text-xl font-extrabold tracking-widest text-primary flex items-center gap-1">
                     <img src="/logo.svg" alt="RE:CAFÉ Logo" className="block" style={{ height: '64px', width: 'auto' }} />
@@ -82,30 +85,60 @@ const Header: React.FC = () => {
                     </div>
 
                     {isAuthenticated && user ? (
-                        <div className="flex items-center gap-3">
-                            <span className="text-text-dark font-bold text-sm bg-secondary/10 px-3 py-1.5 rounded-full border border-secondary/20">
-                                {user.fullName || user.username}
-                            </span>
-                            {(isAdmin || isStaff) && (
-                                <Link
-                                    to="/admin"
-                                    className="flex items-center gap-1.5 py-2 px-4 rounded-full text-[0.9rem] font-semibold bg-[#4b2311] text-white hover:bg-[#68361c] transition-all duration-200 hover:-translate-y-[1px]"
-                                >
-                                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                                        <rect x="3" y="3" width="7" height="7" rx="1" />
-                                        <rect x="14" y="3" width="7" height="7" rx="1" />
-                                        <rect x="3" y="14" width="7" height="7" rx="1" />
-                                        <rect x="14" y="14" width="7" height="7" rx="1" />
-                                    </svg>
-                                    Quản lý
-                                </Link>
-                            )}
-                            <button 
-                                className="btn-contact bg-secondary text-white border-none py-2 px-5 rounded-full text-[0.9rem] font-semibold cursor-pointer transition-all duration-200 hover:bg-secondary-hover hover:-translate-y-[1px]" 
-                                onClick={logout}
+                        <div className="relative">
+                            <button
+                                onClick={() => setDropdownOpen(!dropdownOpen)}
+                                className="flex items-center gap-1.5 text-text-dark font-bold text-sm bg-transparent hover:text-primary transition-all outline-none border-none"
+                                style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
                             >
-                                {language === 'vi' ? 'Đăng xuất' : 'Logout'}
+                                <span>{user.fullName || user.username}</span>
+                                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" className={`transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`}>
+                                    <polyline points="6 9 12 15 18 9" />
+                                </svg>
                             </button>
+
+                            {dropdownOpen && (
+                                <>
+                                    {/* Backdrop to close dropdown */}
+                                    <div 
+                                        className="fixed inset-0 z-40 cursor-default" 
+                                        onClick={() => setDropdownOpen(false)}
+                                    />
+                                    <div className="absolute right-0 mt-2 w-48 bg-white border border-[#e8ddd5] rounded shadow-lg py-1.5 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                                        {(isAdmin || isStaff) && (
+                                            <Link
+                                                to="/admin"
+                                                onClick={() => setDropdownOpen(false)}
+                                                className="flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-[#4b2311] hover:bg-[#f0ebe4] transition-colors"
+                                            >
+                                                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                                                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                                                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                                                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                                                </svg>
+                                                Quản lý
+                                            </Link>
+                                        )}
+                                        <button
+                                            onClick={() => {
+                                                setDropdownOpen(false);
+                                                logout();
+                                                showToast('Đăng xuất thành công!', 'success');
+                                            }}
+                                            className="w-full flex items-center gap-2 px-4 py-2.5 text-sm font-semibold text-red-600 hover:bg-[#f5f0eb] transition-colors text-left"
+                                            style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
+                                        >
+                                            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                                <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
+                                                <polyline points="16 17 21 12 16 7" />
+                                                <line x1="21" y1="12" x2="9" y2="12" />
+                                            </svg>
+                                            {language === 'vi' ? 'Đăng xuất' : 'Logout'}
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     ) : (
                         <button 

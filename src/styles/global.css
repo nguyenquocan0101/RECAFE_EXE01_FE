@@ -117,7 +117,7 @@ input, button, select, textarea {
   position: sticky;
   top: 0;
   z-index: 100;
-  border-bottom: 1px solid var(--border);
+  border-bottom: none;
   transition: all var(--transition-normal);
 }
 
@@ -2900,4 +2900,47 @@ input, button, select, textarea {
 .lang-divider {
   color: var(--border);
   font-weight: 300;
+}
+
+/* Toast Animations */
+@keyframes slideInFromRight {
+  0% {
+    transform: translateX(120%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-toast-in {
+  animation: slideInFromRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Modal Pop Animation */
+@keyframes popFromButton {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.animate-pop-from-button {
+  transform-origin: top right;
+  animation: popFromButton 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Browser Autofill Sage Green Override */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #f4f6f0 inset !important;
+  -webkit-text-fill-color: #4b2311 !important;
+  transition: background-color 5000s ease-in-out 0s;
 }

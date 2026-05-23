@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
 
 const AdminLayout: React.FC = () => {
     const { user, isAdmin, isStaff, logout } = useAuth();
+    const { showToast } = useToast();
     const navigate = useNavigate();
     const [sidebarOpen, setSidebarOpen] = useState(true);
 
     const handleLogout = async () => {
         await logout();
+        showToast('Đăng xuất thành công!', 'success');
         navigate('/');
     };
 
