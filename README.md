@@ -1,23 +1,16 @@
-# Dự án RE:CAFÉ - Cấu trúc Thư mục
+# Re Cafe - Frontend (Vite + React + TypeScript)
 
-Chào mừng bạn đến với dự án **RE:CAFÉ**! Đây là cấu trúc thư mục được thiết kế để mở rộng từ một trang web tĩnh hiện tại lên một ứng dụng web hoàn chỉnh có backend và database trong tương lai.
+Quick start:
 
-## Chi tiết các thư mục:
+1. Copy the design images from the `Trang Chủ` folder into `frontend/public/assets`.
+2. From the `frontend` directory install dependencies and run dev server:
 
-- `/public/`: **ĐÂY LÀ THƯ MỤC CHÍNH CỦA WEBSITE.** Mọi thứ hiển thị cho người dùng phải nằm ở đây.
-    - `index.html`: File trang chủ (Entry point).
-    - `/assets/`: Hình ảnh, icons, fonts.
-    - `/css/`: Quản lý style (Vanilla CSS).
-    - `/js/`: Chứa logic JavaScript phía client.
-    - `/blog/`: Chứa các bài viết blog.
-- `/backend/`: **(Dành cho tương lai)** Chứa mã nguồn server.
-- `/docs/`: Lưu trữ tài liệu dự án.
-    - `/api/`: Định nghĩa các luồng xử lý dữ liệu.
-    - `/models/`: Cấu trúc dữ liệu Database.
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## Hướng dẫn phát triển:
-1. Bạn nên di chuyển các đoạn mã CSS trong `index.html` vào file riêng trong `/css/` để file HTML sạch hơn.
-2. Hình ảnh nên được phân loại rõ ràng trong `/assets/images/`.
-3. Khi bạn sẵn sàng tích hợp Database, chúng ta sẽ bắt đầu thiết lập thư mục `/backend/`.
-
-"Think smart. Build better." ☕♻️
+Notes:
+- The project expects the images `HomePage.png`, `Product.png`, and `Detail Product.png` to be placed in `public/assets`.
+- I scaffolded basic pages and components mirroring the provided designs; tell me nếu bạn muốn tôi hoàn thiện layout hoặc thêm routing.
