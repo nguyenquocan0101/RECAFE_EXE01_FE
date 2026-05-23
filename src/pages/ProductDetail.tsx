@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import { useLanguage } from '../context/LanguageContext'
+import { useLanguage } from '@/context/LanguageContext'
 
 const ProductDetail: React.FC = () => {
     const { t, language } = useLanguage()
@@ -63,7 +61,6 @@ const ProductDetail: React.FC = () => {
 
     return (
         <div className="page-product-detail">
-            <Header />
 
             {/* Breadcrumb Navigation */}
             <nav className="breadcrumb-nav">
@@ -254,7 +251,6 @@ const ProductDetail: React.FC = () => {
                 </div>
             </section>
 
-            <Footer />
         </div>
     )
 }

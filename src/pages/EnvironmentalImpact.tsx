@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import { useLanguage } from '../context/LanguageContext'
+import { useLanguage } from '@/context/LanguageContext'
 
 interface Partner {
     id: number
@@ -94,7 +92,6 @@ const EnvironmentalImpact: React.FC = () => {
 
     return (
         <div className="page-impact">
-            <Header />
 
             {/* Hero Section */}
             <section className="impact-hero">
@@ -398,7 +395,6 @@ const EnvironmentalImpact: React.FC = () => {
                 </div>
             </section>
 
-            <Footer />
         </div>
     )
 }

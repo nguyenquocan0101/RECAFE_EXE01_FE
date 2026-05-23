@@ -1,8 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import { useLanguage } from '../context/LanguageContext'
+import { useLanguage } from '@/context/LanguageContext'
 
 const Home: React.FC = () => {
     const { t, language } = useLanguage()
@@ -44,7 +42,6 @@ const Home: React.FC = () => {
 
     return (
         <div className="page-home">
-            <Header />
 
             {/* Hero Section */}
             <section className="hero-section-home">
@@ -206,7 +203,6 @@ const Home: React.FC = () => {
                 </div>
             </section>
 
-            <Footer />
         </div>
     )
 }

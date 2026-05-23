@@ -1,33 +1,64 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700;800&family=JetBrains+Mono:wght@400&display=swap');
+@import "tailwindcss/theme";
+@import "tailwindcss/utilities";
+
+@theme {
+  --color-primary: #657b35;
+  --color-primary-hover: #798e3a;
+  --color-secondary: #925f3c;
+  --color-secondary-hover: #68361c;
+  --color-dark-bg: #4b2311;
+  --color-light-bg: #ffffff;
+  --color-text-dark: #4b2311;
+  --color-text-muted: #68361c;
+  --color-border-color: #68361c;
+  --font-sans: "Be Vietnam Pro", sans-serif;
+  --font-serif: "Be Vietnam Pro", sans-serif;
+  --font-code: "JetBrains Mono", monospace;
+
+  --animate-slide-up: slideUp 0.3s ease-out forwards;
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(20px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
 
 /* ========== DESIGN SYSTEM TOKENS ========== */
 :root {
   /* Colors */
-  --primary: #a43a42;
-  --primary-hover: #8b323a;
-  --primary-light: #fbebee;
-  --secondary: #6b5344;
-  --secondary-hover: #543f32;
-  --accent: #2d5016; /* Deep Green */
-  --accent-light: #e6eee0;
-  --dark-bg: #132416; /* Deep Forest Green for stats */
-  --light-bg: #f9f6f0; /* Off-white warm background */
-  --gray-light: #f2ede4;
-  --text-dark: #1f1a17;
-  --text-muted: #706863;
-  --border: #e6dfd5;
+  --primary: #657b35; /* Green Accent */
+  --primary-hover: #798e3a; /* Bright Green Accent */
+  --primary-light: #f2f5eb; /* Light Green Tint */
+  --secondary: #925f3c; /* Warm Brown */
+  --secondary-hover: #68361c; /* Deep Brown Accent */
+  --accent: #657b35; /* Green Accent */
+  --accent-light: #f2f5eb;
+  --dark-bg: #4b2311; /* Level 3 Elevation structure */
+  --light-bg: #ffffff; /* Level 0 Background */
+  --gray-light: #eae3d5; /* Level 1 Warm structure */
+  --text-dark: #4b2311; /* Deep Brown Text */
+  --text-muted: #68361c; /* Secondary Brown Text */
+  --border: #68361c; /* Border Brown */
   --white: #ffffff;
-  --shadow-sm: 0 2px 8px rgba(31, 26, 23, 0.04);
-  --shadow-md: 0 8px 24px rgba(31, 26, 23, 0.08);
-  --shadow-lg: 0 16px 48px rgba(31, 26, 23, 0.12);
+  --shadow-sm: 0 2px 8px rgba(75, 35, 17, 0.06);
+  --shadow-md: 0 8px 24px rgba(75, 35, 17, 0.1);
+  --shadow-lg: 0 16px 48px rgba(75, 35, 17, 0.14);
   --radius-sm: 4px;
   --radius-md: 12px;
   --radius-lg: 24px;
   --radius-full: 9999px;
 
   /* Typography */
-  --font-sans: 'Outfit', sans-serif;
-  --font-serif: 'Playfair Display', serif;
+  --font-sans: "Be Vietnam Pro", sans-serif;
+  --font-serif: "Be Vietnam Pro", sans-serif;
+  --font-code: "JetBrains Mono", monospace;
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -41,9 +72,11 @@
 
 body {
   font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 400;
   background-color: var(--light-bg);
   color: var(--text-dark);
-  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -223,12 +256,12 @@ input, button, select, textarea {
 .btn-primary {
   background-color: var(--primary);
   color: var(--white);
-  box-shadow: 0 4px 12px rgba(164, 58, 66, 0.15);
+  box-shadow: 0 4px 12px rgba(101, 123, 53, 0.18);
 }
 
 .btn-primary:hover {
   background-color: var(--primary-hover);
-  box-shadow: 0 6px 20px rgba(164, 58, 66, 0.25);
+  box-shadow: 0 6px 20px rgba(101, 123, 53, 0.28);
   transform: translateY(-2px);
 }
 
@@ -321,9 +354,10 @@ input, button, select, textarea {
 
 .hero-title {
   font-family: var(--font-sans);
-  font-size: 3.5rem;
+  font-size: 64px;
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 72px;
+  letter-spacing: -0.03em;
   color: var(--text-dark);
   margin-bottom: 1.5rem;
 }
@@ -586,11 +620,12 @@ input, button, select, textarea {
 }
 
 .card-title {
-  font-size: 1.25rem;
+  font-family: var(--font-sans);
+  font-size: 16px;
   font-weight: 700;
   color: var(--text-dark);
   margin-bottom: 0.75rem;
-  line-height: 1.3;
+  line-height: 22px;
 }
 
 .card-description {
@@ -764,7 +799,7 @@ input, button, select, textarea {
   width: 60px;
   height: 60px;
   border-radius: var(--radius-full);
-  background-color: #5c1822; /* Highlands coffee red */
+  background-color: var(--primary); /* Green deck primary accent */
   color: var(--white);
   display: flex;
   align-items: center;
@@ -777,7 +812,7 @@ input, button, select, textarea {
 .partner-info h5 {
   font-size: 1.2rem;
   font-weight: 800;
-  color: #5c1822;
+  color: var(--primary);
   letter-spacing: 0.5px;
 }
 

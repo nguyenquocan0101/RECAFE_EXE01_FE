@@ -1,13 +1,16 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import App from './App'
-import { LanguageProvider } from './context/LanguageContext'
-import './styles/global.css'
+import App from '@/App'
+import { LanguageProvider } from '@/context/LanguageContext'
+import { AuthProvider } from '@/context/AuthContext'
+import '@/styles/global.css'
 
 createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <LanguageProvider>
-            <App />
+            <AuthProvider>
+                <App />
+            </AuthProvider>
         </LanguageProvider>
     </React.StrictMode>
 )

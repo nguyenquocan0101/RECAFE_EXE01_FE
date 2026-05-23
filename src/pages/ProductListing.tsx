@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import { useLanguage } from '../context/LanguageContext'
+import { useLanguage } from '@/context/LanguageContext'
 
 interface Product {
     id: number
@@ -147,7 +145,6 @@ const ProductListing: React.FC = () => {
 
     return (
         <div className="page-products">
-            <Header />
 
             {/* Header Title section */}
             <section className="curated-header">
@@ -343,7 +340,6 @@ const ProductListing: React.FC = () => {
                 </div>
             </section>
 
-            <Footer />
         </div>
     )
 }
