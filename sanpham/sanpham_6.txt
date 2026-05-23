@@ -1,0 +1,14 @@
+ID: 6
+Tên (VI): Thìa đong định lượng Artisan
+Tên (EN): Artisan Measuring Scoop
+Giá: 24 USD
+Mô tả (VI): Thìa đong định lượng bằng gỗ và bã cà phê, khắc cán theo yêu cầu...
+Mô tả (EN): Precision scoop with a custom engraved handle...
+Hình ảnh: re_cup.png
+Đường dẫn hình ảnh: /assets/re_cup.png
+Nhãn (VI): THIẾT KẾ RIÊNG
+Nhãn (EN): PERSONALIZED
+Tags: Handmade, Eco-friendly
+Còn hàng: Có (True)
+Danh mục: Limited Edition
+Bộ sưu tập: Personalized

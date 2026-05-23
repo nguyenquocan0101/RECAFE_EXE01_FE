@@ -1,0 +1,14 @@
+ID: 4
+Tên (VI): Chậu cây để bàn Aroma
+Tên (EN): Aroma Table Planter
+Giá: 32 USD
+Mô tả (VI): Chậu cây bã cà phê thoáng khí, mang sắc xanh tự nhiên cho căn phòng...
+Mô tả (EN): Breathable, eco-friendly planter that provides natu...
+Hình ảnh: re_vase.png
+Đường dẫn hình ảnh: /assets/re_vase.png
+Nhãn (VI): Không có
+Nhãn (EN): None
+Tags: Decor, Eco-friendly
+Còn hàng: Có (True)
+Danh mục: Decor
+Bộ sưu tập: New Arrivals

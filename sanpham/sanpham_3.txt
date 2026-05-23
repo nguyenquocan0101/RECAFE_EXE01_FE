@@ -1,0 +1,14 @@
+ID: 3
+Tên (VI): Bộ lót ly Origin (Bộ 4 chiếc)
+Tên (EN): Origin Coasters (Set of 4)
+Giá: 45 USD
+Mô tả (VI): Đế lót ly khắc laser sắc nét từ chất liệu bã cà phê ép...
+Mô tả (EN): Precision laser-etched coasters featuring...
+Hình ảnh: re_cup.png
+Đường dẫn hình ảnh: /assets/re_cup.png
+Nhãn (VI): HẾT HÀNG
+Nhãn (EN): OUT OF STOCK
+Tags: Gifts, Handmade
+Còn hàng: Không (False)
+Danh mục: Gifts
+Bộ sưu tập: Best Sellers

@@ -1,0 +1,14 @@
+ID: 2
+Tên (VI): Đồng hồ treo tường Bloom
+Tên (EN): Bloom Wall Clock
+Giá: 120 USD
+Mô tả (VI): Đồng hồ treo tường kim trôi tĩnh âm, thiết kế từ chất liệu bã cà phê...
+Mô tả (EN): A silent, statement wall clock designed with high-...
+Hình ảnh: bloom_clock.png
+Đường dẫn hình ảnh: /assets/bloom_clock.png
+Nhãn (VI): BÁN CHẠY
+Nhãn (EN): BEST SELLER
+Tags: Decor, Eco-friendly
+Còn hàng: Có (True)
+Danh mục: Decor
+Bộ sưu tập: Best Sellers

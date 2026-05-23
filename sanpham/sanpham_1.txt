@@ -1,0 +1,14 @@
+ID: 1
+Tên (VI): Bộ khay kệ Espresso
+Tên (EN): Espresso Desk Set
+Giá: 85 USD
+Mô tả (VI): Bộ khay đựng đồ văn phòng làm bằng bã cà phê, thiết kế tối giản...
+Mô tả (EN): Handcrafted desk organizer set featuring a minimalist...
+Hình ảnh: re_tray.png
+Đường dẫn hình ảnh: /assets/re_tray.png
+Nhãn (VI): MỚI VỀ
+Nhãn (EN): NEW ARRIVAL
+Tags: Decor, Handmade
+Còn hàng: Có (True)
+Danh mục: Decor
+Bộ sưu tập: New Arrivals

@@ -1,0 +1,14 @@
+ID: 5
+Tên (VI): Bộ nến thơm Vessel
+Tên (EN): Vessel Candle Set
+Giá: 58 USD
+Mô tả (VI): Bộ ba cốc nến sáp đậu nành cao cấp phảng phất hương vị Arabica...
+Mô tả (EN): A trio of soy-wax candles with scents of Arabica and...
+Hình ảnh: re_glow.png
+Đường dẫn hình ảnh: /assets/re_glow.png
+Nhãn (VI): Không có
+Nhãn (EN): None
+Tags: Gifts, Handmade
+Còn hàng: Có (True)
+Danh mục: Gifts
+Bộ sưu tập: Best Sellers
