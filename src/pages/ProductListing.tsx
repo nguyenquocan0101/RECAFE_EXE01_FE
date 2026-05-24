@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '@/context/LanguageContext'
 
 interface Product {
-    id: number
+    id: number | string
     title: string
     price: number
     description: string
@@ -106,6 +106,39 @@ const ProductListing: React.FC = () => {
         }
     ]
 
+    const [dbProducts, setDbProducts] = useState<any[]>([])
+
+    useEffect(() => {
+        fetch('/api/Products')
+            .then(res => res.json())
+            .then(data => {
+                const list = Array.isArray(data) ? data : (data?.data || []);
+                setDbProducts(list);
+            })
+            .catch(err => console.error('Error loading public products:', err));
+    }, []);
+
+    const mappedProducts: Product[] = dbProducts.map((p) => {
+        const tags = [p.categoryName || 'Decor'];
+        if (p.isPersonalizable) tags.push('Handmade');
+        if (p.rewardPoints) tags.push('Eco-friendly');
+
+        return {
+            id: p.id,
+            title: p.name,
+            price: p.price,
+            description: p.shortDescription || p.description || 'Sản phẩm làm từ bã cà phê tái chế.',
+            image: p.thumbnailUrl || p.image || '/assets/re_cup.png',
+            badge: p.isPersonalizable ? 'THIẾT KẾ RIÊNG' : (p.rewardPoints ? 'MỚI VỀ' : undefined),
+            tags: tags,
+            inStock: p.isActive !== false,
+            category: p.categoryName || 'Decor',
+            collection: p.isPersonalizable ? 'Personalized' : (p.rewardPoints ? 'New Arrivals' : 'Best Sellers')
+        };
+    });
+
+    const allProducts = dbProducts.length > 0 ? mappedProducts : products;
+
     const handleCategoryChange = (category: string) => {
         if (selectedCategories.includes(category)) {
             setSelectedCategories(selectedCategories.filter(c => c !== category))
@@ -114,8 +147,9 @@ const ProductListing: React.FC = () => {
         }
     }
 
-    const filteredProducts = products.filter(product => {
-        if (product.price > priceRange) return false
+    const filteredProducts = allProducts.filter(product => {
+        const checkPrice = product.price > 1000 ? product.price / 1000 : product.price;
+        if (checkPrice > priceRange) return false
         if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) return false
         if (selectedCollection && product.collection !== selectedCollection) return false
         return true
@@ -257,7 +291,7 @@ const ProductListing: React.FC = () => {
                                             <h3 className="card-title">{product.title}</h3>
                                             <p className="card-description">{product.description}</p>
                                             <div className="card-footer" onClick={(e) => e.stopPropagation()}>
-                                                <span className="card-price">${product.price}.00</span>
+                                                <span className="card-price">{product.price > 1000 ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) : `$${product.price}.00`}</span>
                                                 {product.inStock ? (
                                                     <button className="btn-add-to-cart" title={t('detail.addToCart')} onClick={() => alert(`Added ${product.title} to cart!`)}>
                                                         <svg viewBox="0 0 24 24">

@@ -6,6 +6,25 @@
   },
   "paths": {
     "/api/admin/categories": {
+      "get": {
+        "tags": [
+          "AdminCategories"
+        ],
+        "parameters": [
+          {
+            "name": "isActive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
       "post": {
         "tags": [
           "AdminCategories"
@@ -92,6 +111,44 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/admin/media/upload-image": {
+      "post": {
+        "tags": [
+          "AdminMedia"
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "File": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "Folder": {
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "File": {
+                  "style": "form"
+                },
+                "Folder": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "OK"
@@ -202,19 +259,146 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/CreateProductRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateProductRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateProductRequest"
+                "required": [
+                  "CategoryId",
+                  "Name",
+                  "Price",
+                  "SKU",
+                  "Slug"
+                ],
+                "type": "object",
+                "properties": {
+                  "CategoryId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "Name": {
+                    "maxLength": 150,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "Slug": {
+                    "maxLength": 200,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "SKU": {
+                    "maxLength": 50,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "Price": {
+                    "maximum": 1.7976931348623157E+308,
+                    "minimum": 0,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "SalePrice": {
+                    "maximum": 1.7976931348623157E+308,
+                    "minimum": 0,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "ShortDescription": {
+                    "maxLength": 500,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "Description": {
+                    "maxLength": 2000,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "Material": {
+                    "maxLength": 200,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "Size": {
+                    "maxLength": 100,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "UsageNote": {
+                    "maxLength": 500,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "IsPersonalizable": {
+                    "type": "boolean"
+                  },
+                  "IsActive": {
+                    "type": "boolean"
+                  },
+                  "RewardPoints": {
+                    "maximum": 2147483647,
+                    "minimum": 0,
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "ImageFolder": {
+                    "type": "string"
+                  },
+                  "Images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              },
+              "encoding": {
+                "CategoryId": {
+                  "style": "form"
+                },
+                "Name": {
+                  "style": "form"
+                },
+                "Slug": {
+                  "style": "form"
+                },
+                "SKU": {
+                  "style": "form"
+                },
+                "Price": {
+                  "style": "form"
+                },
+                "SalePrice": {
+                  "style": "form"
+                },
+                "ShortDescription": {
+                  "style": "form"
+                },
+                "Description": {
+                  "style": "form"
+                },
+                "Material": {
+                  "style": "form"
+                },
+                "Size": {
+                  "style": "form"
+                },
+                "UsageNote": {
+                  "style": "form"
+                },
+                "IsPersonalizable": {
+                  "style": "form"
+                },
+                "IsActive": {
+                  "style": "form"
+                },
+                "RewardPoints": {
+                  "style": "form"
+                },
+                "ImageFolder": {
+                  "style": "form"
+                },
+                "Images": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -244,19 +428,152 @@
         ],
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/UpdateProductRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateProductRequest"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateProductRequest"
+                "required": [
+                  "CategoryId",
+                  "Name",
+                  "Price",
+                  "SKU",
+                  "Slug"
+                ],
+                "type": "object",
+                "properties": {
+                  "CategoryId": {
+                    "type": "string",
+                    "format": "uuid"
+                  },
+                  "Name": {
+                    "maxLength": 150,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "Slug": {
+                    "maxLength": 200,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "SKU": {
+                    "maxLength": 50,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "Price": {
+                    "maximum": 1.7976931348623157E+308,
+                    "minimum": 0,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "SalePrice": {
+                    "maximum": 1.7976931348623157E+308,
+                    "minimum": 0,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "ShortDescription": {
+                    "maxLength": 500,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "Description": {
+                    "maxLength": 2000,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "Material": {
+                    "maxLength": 200,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "Size": {
+                    "maxLength": 100,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "UsageNote": {
+                    "maxLength": 500,
+                    "minLength": 0,
+                    "type": "string"
+                  },
+                  "IsPersonalizable": {
+                    "type": "boolean"
+                  },
+                  "IsActive": {
+                    "type": "boolean"
+                  },
+                  "RewardPoints": {
+                    "maximum": 2147483647,
+                    "minimum": 0,
+                    "type": "integer",
+                    "format": "int32"
+                  },
+                  "ReplaceImages": {
+                    "type": "boolean"
+                  },
+                  "ImageFolder": {
+                    "type": "string"
+                  },
+                  "Images": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary"
+                    }
+                  }
+                }
+              },
+              "encoding": {
+                "CategoryId": {
+                  "style": "form"
+                },
+                "Name": {
+                  "style": "form"
+                },
+                "Slug": {
+                  "style": "form"
+                },
+                "SKU": {
+                  "style": "form"
+                },
+                "Price": {
+                  "style": "form"
+                },
+                "SalePrice": {
+                  "style": "form"
+                },
+                "ShortDescription": {
+                  "style": "form"
+                },
+                "Description": {
+                  "style": "form"
+                },
+                "Material": {
+                  "style": "form"
+                },
+                "Size": {
+                  "style": "form"
+                },
+                "UsageNote": {
+                  "style": "form"
+                },
+                "IsPersonalizable": {
+                  "style": "form"
+                },
+                "IsActive": {
+                  "style": "form"
+                },
+                "RewardPoints": {
+                  "style": "form"
+                },
+                "ReplaceImages": {
+                  "style": "form"
+                },
+                "ImageFolder": {
+                  "style": "form"
+                },
+                "Images": {
+                  "style": "form"
+                }
               }
             }
           }
@@ -529,6 +846,19 @@
         "tags": [
           "Categories"
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "tags": [
+          "EXE02_Backend_RE-CAFE"
+        ],
+        "operationId": "HealthCheck",
         "responses": {
           "200": {
             "description": "OK"
@@ -810,93 +1140,6 @@
         },
         "additionalProperties": false
       },
-      "CreateProductRequest": {
-        "required": [
-          "categoryId",
-          "name",
-          "price",
-          "sku",
-          "slug"
-        ],
-        "type": "object",
-        "properties": {
-          "categoryId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "maxLength": 150,
-            "minLength": 0,
-            "type": "string"
-          },
-          "slug": {
-            "maxLength": 200,
-            "minLength": 0,
-            "type": "string"
-          },
-          "sku": {
-            "maxLength": 50,
-            "minLength": 0,
-            "type": "string"
-          },
-          "price": {
-            "maximum": 1.7976931348623157E+308,
-            "minimum": 0,
-            "type": "number",
-            "format": "double"
-          },
-          "salePrice": {
-            "maximum": 1.7976931348623157E+308,
-            "minimum": 0,
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "shortDescription": {
-            "maxLength": 500,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "description": {
-            "maxLength": 2000,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "material": {
-            "maxLength": 200,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "size": {
-            "maxLength": 100,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "usageNote": {
-            "maxLength": 500,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "isPersonalizable": {
-            "type": "boolean"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "rewardPoints": {
-            "maximum": 2147483647,
-            "minimum": 0,
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
       "LoginRequest": {
         "required": [
           "password",
@@ -1007,93 +1250,6 @@
         },
         "additionalProperties": false
       },
-      "UpdateProductRequest": {
-        "required": [
-          "categoryId",
-          "name",
-          "price",
-          "sku",
-          "slug"
-        ],
-        "type": "object",
-        "properties": {
-          "categoryId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "maxLength": 150,
-            "minLength": 0,
-            "type": "string"
-          },
-          "slug": {
-            "maxLength": 200,
-            "minLength": 0,
-            "type": "string"
-          },
-          "sku": {
-            "maxLength": 50,
-            "minLength": 0,
-            "type": "string"
-          },
-          "price": {
-            "maximum": 1.7976931348623157E+308,
-            "minimum": 0,
-            "type": "number",
-            "format": "double"
-          },
-          "salePrice": {
-            "maximum": 1.7976931348623157E+308,
-            "minimum": 0,
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "shortDescription": {
-            "maxLength": 500,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "description": {
-            "maxLength": 2000,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "material": {
-            "maxLength": 200,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "size": {
-            "maxLength": 100,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "usageNote": {
-            "maxLength": 500,
-            "minLength": 0,
-            "type": "string",
-            "nullable": true
-          },
-          "isPersonalizable": {
-            "type": "boolean"
-          },
-          "isActive": {
-            "type": "boolean"
-          },
-          "rewardPoints": {
-            "maximum": 2147483647,
-            "minimum": 0,
-            "type": "integer",
-            "format": "int32"
-          }
-        },
-        "additionalProperties": false
-      },
       "UserRole": {
         "enum": [
           0,
@@ -1131,6 +1287,9 @@
   "tags": [
     {
       "name": "AdminCategories"
+    },
+    {
+      "name": "AdminMedia"
     },
     {
       "name": "AdminOrders"

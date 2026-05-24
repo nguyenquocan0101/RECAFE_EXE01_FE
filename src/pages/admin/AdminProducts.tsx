@@ -21,6 +21,8 @@ interface Product {
     usageNote?: string;
     isPersonalizable?: boolean;
     rewardPoints?: number;
+    image?: string;
+    thumbnailUrl?: string;
 }
 
 const AdminProducts: React.FC = () => {
@@ -335,7 +337,7 @@ const AdminProducts: React.FC = () => {
                                             <td className="px-6 py-5">
                                                 <div className="flex items-center gap-4">
                                                     <img 
-                                                        src={getProductImage(p.id)} 
+                                                        src={p.thumbnailUrl || p.image || getProductImage(p.id)} 
                                                         alt={p.name} 
                                                         className="w-12 h-12 object-cover rounded border border-[#e8ddd5]/30 shadow-sm shrink-0" 
                                                     />

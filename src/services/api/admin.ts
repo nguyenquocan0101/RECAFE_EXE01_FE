@@ -68,19 +68,46 @@ export const getAdminProducts = () =>
         headers: { 'Content-Type': 'application/json', ...authHeader() }
     }).then(handleResponse);
 
-export const createProduct = (data: Record<string, any>) =>
-    fetch(`${apiUrl}api/admin/products`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeader() },
-        body: JSON.stringify(data)
-    }).then(handleResponse);
+const convertToFormData = (data: Record<string, any>): FormData => {
+    if (data instanceof FormData) return data;
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+            // Map camelCase keys to TitleCase expected by ASP.NET Core
+            const titleKey = key === 'sku' ? 'SKU' : (key.charAt(0).toUpperCase() + key.slice(1));
+            if (value instanceof File) {
+                formData.append(titleKey, value);
+            } else if (Array.isArray(value)) {
+                value.forEach(item => {
+                    formData.append(titleKey, item);
+                });
+            } else if (typeof value === 'boolean') {
+                formData.append(titleKey, value ? 'true' : 'false');
+            } else {
+                formData.append(titleKey, String(value));
+            }
+        }
+    });
+    return formData;
+};
 
-export const updateProduct = (id: string, data: Record<string, any>) =>
-    fetch(`${apiUrl}api/admin/products/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...authHeader() },
-        body: JSON.stringify(data)
+export const createProduct = (data: Record<string, any> | FormData) => {
+    const body = data instanceof FormData ? data : convertToFormData(data);
+    return fetch(`${apiUrl}api/admin/products`, {
+        method: 'POST',
+        headers: { ...authHeader() },
+        body
     }).then(handleResponse);
+};
+
+export const updateProduct = (id: string, data: Record<string, any> | FormData) => {
+    const body = data instanceof FormData ? data : convertToFormData(data);
+    return fetch(`${apiUrl}api/admin/products/${id}`, {
+        method: 'PUT',
+        headers: { ...authHeader() },
+        body
+    }).then(handleResponse);
+};
 
 export const deleteProduct = (id: string) =>
     fetch(`${apiUrl}api/admin/products/${id}`, {
