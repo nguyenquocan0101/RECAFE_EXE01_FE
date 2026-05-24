@@ -2701,7 +2701,16 @@ input, button, select, textarea {
 
   .detail-thumbnails-list {
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-start;
+    overflow-x: auto;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
+  }
+
+  .detail-thumbnail-item {
+    width: 64px;
+    height: 64px;
+    flex-shrink: 0;
   }
 
   .impact-hero {
@@ -2754,15 +2763,32 @@ input, button, select, textarea {
 
 @media (max-width: 768px) {
   .header-container {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
   }
 
   .main-nav {
-    display: none; /* In production apps, a mobile menu would trigger here */
+    display: none; /* Hidden on mobile; mobile menu overlay used instead */
   }
 
   .search-box {
     display: none;
+  }
+
+  /* Hide lang switcher and login button from header on mobile (shown in mobile menu) */
+  .header-container .lang-switcher,
+  .header-container .btn-contact,
+  .header-container .header-user-dropdown {
+    display: none;
+  }
+
+  /* Show hamburger button */
+  .mobile-hamburger {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    padding: 4px;
   }
 
   .hero-title {

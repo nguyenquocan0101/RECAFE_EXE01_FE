@@ -12,6 +12,7 @@ const Header: React.FC = () => {
     const { cartCount } = useCart()
     const navigate = useNavigate()
     const [dropdownOpen, setDropdownOpen] = useState(false)
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
     const navLinkClass = ({ isActive }: { isActive: boolean }) =>
         `text-[0.95rem] font-medium transition-colors duration-200 relative py-1 hover:text-primary ${
@@ -21,6 +22,7 @@ const Header: React.FC = () => {
         }`
 
     return (
+        <>
         <header className="site-header sticky top-0 z-[100] bg-white/95 backdrop-blur-md transition-all duration-300">
             <div className="header-container max-w-[1400px] mx-auto py-5 px-8 flex justify-between items-center gap-8">
                 <Link to="/" className="logo font-sans text-xl font-extrabold tracking-widest text-primary flex items-center gap-1">
@@ -102,7 +104,7 @@ const Header: React.FC = () => {
                     </button>
 
                     {isAuthenticated && user ? (
-                        <div className="relative">
+                        <div className="relative header-user-dropdown">
                             <button
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
                                 className="flex items-center gap-1.5 text-text-dark font-bold text-sm bg-transparent hover:text-primary transition-all outline-none border-none"
@@ -165,10 +167,143 @@ const Header: React.FC = () => {
                             {t('header.login')}
                         </button>
                     )}
+
+                    {/* Hamburger Button - mobile only */}
+                    <button
+                        id="mobile-menu-btn"
+                        className="mobile-hamburger"
+                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        aria-label="Toggle mobile menu"
+                        style={{ border: 'none', outline: 'none', background: 'transparent', cursor: 'pointer', display: 'none' }}
+                    >
+                        <span style={{ display: 'block', width: '22px', height: '2px', background: mobileMenuOpen ? 'transparent' : 'var(--text-dark)', borderRadius: '2px', transition: 'all 0.25s', transform: mobileMenuOpen ? 'rotate(45deg) translate(5px, 5px)' : 'none' }} />
+                        <span style={{ display: 'block', width: '22px', height: '2px', background: 'var(--text-dark)', borderRadius: '2px', margin: '5px 0', transition: 'all 0.25s', opacity: mobileMenuOpen ? 0 : 1 }} />
+                        <span style={{ display: 'block', width: '22px', height: '2px', background: 'var(--text-dark)', borderRadius: '2px', transition: 'all 0.25s', transform: mobileMenuOpen ? 'rotate(-45deg) translate(5px, -5px)' : 'none' }} />
+                    </button>
                 </div>
             </div>
         </header>
+
+        {/* Mobile Menu Overlay */}
+        {mobileMenuOpen && (
+            <>
+                <div
+                    style={{ position: 'fixed', inset: 0, zIndex: 99, background: 'rgba(75,35,17,0.18)', backdropFilter: 'blur(2px)' }}
+                    onClick={() => setMobileMenuOpen(false)}
+                />
+                <div style={{
+                    position: 'fixed',
+                    top: 0,
+                    right: 0,
+                    width: '80%',
+                    maxWidth: '320px',
+                    height: '100dvh',
+                    background: '#fff',
+                    zIndex: 200,
+                    boxShadow: '-4px 0 32px rgba(75,35,17,0.12)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    padding: '1.5rem',
+                    overflowY: 'auto',
+                    animation: 'slideInFromRight 0.28s cubic-bezier(0.16,1,0.3,1) forwards'
+                }}>
+                    {/* Close button */}
+                    <button
+                        onClick={() => setMobileMenuOpen(false)}
+                        style={{ alignSelf: 'flex-end', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', marginBottom: '1.5rem' }}
+                        aria-label="Close menu"
+                    >
+                        <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <line x1="18" y1="6" x2="6" y2="18" />
+                            <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+
+                    {/* Mobile Nav Links */}
+                    <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', marginBottom: '2rem' }}>
+                        <NavLink
+                            to="/"
+                            className={navLinkClass}
+                            end
+                            onClick={() => setMobileMenuOpen(false)}
+                            style={{ fontSize: '1.1rem', padding: '0.75rem 0', borderBottom: '1px solid #f0ebe4' }}
+                        >
+                            {t('header.home')}
+                        </NavLink>
+                        <NavLink
+                            to="/products"
+                            className={navLinkClass}
+                            onClick={() => setMobileMenuOpen(false)}
+                            style={{ fontSize: '1.1rem', padding: '0.75rem 0', borderBottom: '1px solid #f0ebe4' }}
+                        >
+                            {t('header.products')}
+                        </NavLink>
+                        <a
+                            href="#our-story"
+                            style={{ fontSize: '1.1rem', padding: '0.75rem 0', borderBottom: '1px solid #f0ebe4', color: 'var(--text-muted)', fontWeight: 500 }}
+                            onClick={(e) => {
+                                e.preventDefault()
+                                setMobileMenuOpen(false)
+                                setTimeout(() => {
+                                    const el = document.getElementById('our-story')
+                                    if (el) el.scrollIntoView({ behavior: 'smooth' })
+                                }, 150)
+                            }}
+                        >
+                            {t('header.ourStory')}
+                        </a>
+                        <NavLink
+                            to="/environmental-impact"
+                            className={navLinkClass}
+                            onClick={() => setMobileMenuOpen(false)}
+                            style={{ fontSize: '1.1rem', padding: '0.75rem 0', borderBottom: '1px solid #f0ebe4' }}
+                        >
+                            {t('header.environmentalImpact')}
+                        </NavLink>
+                    </nav>
+
+                    {/* Language switcher in mobile menu */}
+                    <div className="lang-switcher" style={{ marginBottom: '1.5rem', alignSelf: 'flex-start' }}>
+                        <button
+                            className={`lang-btn ${language === 'vi' ? 'active' : ''}`}
+                            onClick={() => language !== 'vi' && toggleLanguage()}
+                        >VI</button>
+                        <span className="lang-divider">|</span>
+                        <button
+                            className={`lang-btn ${language === 'en' ? 'active' : ''}`}
+                            onClick={() => language !== 'en' && toggleLanguage()}
+                        >EN</button>
+                    </div>
+
+                    {/* Auth section in mobile menu */}
+                    {isAuthenticated && user ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            <span style={{ fontWeight: 700, color: 'var(--text-dark)', fontSize: '0.95rem' }}>{user.fullName || user.username}</span>
+                            {(isAdmin || isStaff) && (
+                                <Link to="/admin" onClick={() => setMobileMenuOpen(false)} style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem' }}>Quản lý</Link>
+                            )}
+                            <button
+                                onClick={() => { setMobileMenuOpen(false); logout(); showToast('Đăng xuất thành công!', 'success'); }}
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#c83a42', fontWeight: 600, fontSize: '0.9rem', textAlign: 'left', padding: 0 }}
+                            >
+                                {language === 'vi' ? 'Đăng xuất' : 'Logout'}
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            className="btn-contact"
+                            onClick={() => { setMobileMenuOpen(false); openLoginModal(); }}
+                            style={{ alignSelf: 'flex-start' }}
+                        >
+                            {t('header.login')}
+                        </button>
+                    )}
+                </div>
+            </>
+        )}
+        </>
     )
 }
+
 
 export default Header
