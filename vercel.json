@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "http://161.118.238.100:5080/api/:path*"
+      "destination": "https://api.recafe.site/api/:path*"
     }
   ]
 }
