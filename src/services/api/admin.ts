@@ -1,4 +1,4 @@
-const apiUrl = import.meta.env.VITE_API_URL || '';
+const apiUrl = import.meta.env.VITE_API_URL || '/';
 
 const authHeader = (): Record<string, string> => {
     const token = localStorage.getItem('token');
@@ -36,6 +36,11 @@ export const updateOrderStatus = (id: string, status: string) =>
 
 // ─── Categories ────────────────────────────────────────────────────────────
 
+export const getAdminCategories = () =>
+    fetch(`${apiUrl}api/admin/categories`, {
+        headers: { 'Content-Type': 'application/json', ...authHeader() }
+    }).then(handleResponse);
+
 export const createCategory = (data: { name: string; slug: string; description?: string; isActive?: boolean }) =>
     fetch(`${apiUrl}api/admin/categories`, {
         method: 'POST',
@@ -57,6 +62,11 @@ export const deleteCategory = (id: string) =>
     }).then(handleResponse);
 
 // ─── Products ──────────────────────────────────────────────────────────────
+
+export const getAdminProducts = () =>
+    fetch(`${apiUrl}api/admin/products`, {
+        headers: { 'Content-Type': 'application/json', ...authHeader() }
+    }).then(handleResponse);
 
 export const createProduct = (data: Record<string, any>) =>
     fetch(`${apiUrl}api/admin/products`, {
