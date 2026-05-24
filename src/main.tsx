@@ -4,16 +4,19 @@ import App from '@/App'
 import { LanguageProvider } from '@/context/LanguageContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { ToastProvider } from '@/context/ToastContext'
+import { CartProvider } from '@/context/CartContext'
 import '@/styles/global.css'
 
 createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <LanguageProvider>
-            <AuthProvider>
-                <ToastProvider>
-                    <App />
-                </ToastProvider>
-            </AuthProvider>
+            <ToastProvider>
+                <AuthProvider>
+                    <CartProvider>
+                        <App />
+                    </CartProvider>
+                </AuthProvider>
+            </ToastProvider>
         </LanguageProvider>
     </React.StrictMode>
 )

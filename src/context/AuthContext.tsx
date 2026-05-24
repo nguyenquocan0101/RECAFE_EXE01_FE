@@ -19,12 +19,18 @@ interface AuthContextProps {
     isCustomer: boolean;
     isLoading: boolean;
     error: string | null;
+    isLoginModalOpen: boolean;
+    loginReason: string | undefined;
+    openLoginModal: (reason?: string) => void;
+    closeLoginModal: () => void;
     login: (usernameOrEmail: string, password: string) => Promise<void>;
     register: (username: string, email: string, password: string, fullName?: string) => Promise<void>;
     logout: () => Promise<void>;
     changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
     clearError: () => void;
 }
+
+
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
@@ -33,6 +39,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+    const [loginReason, setLoginReason] = useState<string | undefined>(undefined);
+
+    const openLoginModal = (reason?: string) => {
+        setLoginReason(reason);
+        setIsLoginModalOpen(true);
+    };
+    const closeLoginModal = () => {
+        setIsLoginModalOpen(false);
+        setLoginReason(undefined);
+    };
 
     const fetchUserProfile = async (authToken: string) => {
         try {
@@ -159,6 +176,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 isCustomer,
                 isLoading,
                 error,
+                isLoginModalOpen,
+                loginReason,
+                openLoginModal,
+                closeLoginModal,
                 login,
                 register,
                 logout,

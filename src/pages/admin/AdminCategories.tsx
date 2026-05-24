@@ -96,7 +96,7 @@ const AdminCategories: React.FC = () => {
         const payload = {
             name: category.name,
             slug: category.slug,
-            description: category.description || null,
+            description: category.description || undefined,
             isActive: category.isActive !== false ? false : true
         };
         try {

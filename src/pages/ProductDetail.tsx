@@ -1,63 +1,217 @@
-import React, { useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import React, { useState, useEffect } from 'react'
+import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useLanguage } from '@/context/LanguageContext'
+import ProductInfoCard from '@/components/product/ProductInfoCard'
+import { useCart } from '@/context/CartContext'
+import { useAuth } from '@/context/AuthContext'
+
+interface ProductImage {
+    id: string;
+    imageUrl: string;
+    isThumbnail: boolean;
+    sortOrder: number;
+}
+
+interface ProductCategory {
+    id: string;
+    name: string;
+    slug: string;
+    description?: string;
+}
+
+interface DBProduct {
+    id: string;
+    categoryId: string;
+    name: string;
+    slug: string;
+    sku: string;
+    price: number;
+    salePrice?: number | null;
+    shortDescription?: string | null;
+    description?: string | null;
+    material?: string | null;
+    size?: string | null;
+    usageNote?: string | null;
+    isPersonalizable?: boolean;
+    rewardPoints?: number;
+    category?: ProductCategory | null;
+    images?: ProductImage[] | null;
+}
 
 const ProductDetail: React.FC = () => {
     const { t, language } = useLanguage()
-    const { id } = useParams<{ id: string }>()
+    const { slug } = useParams<{ slug: string }>()
+    const { addToCart } = useCart()
+    const { isAuthenticated, openLoginModal } = useAuth()
+    const navigate = useNavigate()
     const [selectedImageIdx, setSelectedImageIdx] = useState(0)
     const [quantity, setQuantity] = useState(1)
+    const [dbProduct, setDbProduct] = useState<DBProduct | null>(null)
+    const [loading, setLoading] = useState(true)
+    const [relatedProducts, setRelatedProducts] = useState<any[]>([])
 
-    const images = [
-        '/assets/re_vase.png',
-        '/assets/re_tray.png',
-        '/assets/coffee_grounds.png'
-    ]
+    useEffect(() => {
+        if (!slug) return;
+        setLoading(true);
 
-    const relatedProducts = [
-        {
-            id: 1,
-            title: language === 'vi' ? 'Khay đựng bã cà phê tái chế' : 'Recycled Coffee Tray',
-            category: 'DECOR',
-            price: '420,000 VND',
-            image: '/assets/re_tray.png'
-        },
-        {
-            id: 2,
-            title: language === 'vi' ? 'Bộ lót ly bền vững' : 'Sustainable Coaster Set',
-            category: 'OFFICE',
-            price: '250,000 VND',
-            image: '/assets/re_cup.png'
-        },
-        {
-            id: 3,
-            title: language === 'vi' ? 'Hộp cắm bút nghệ thuật' : 'Artisan Desk Organizer',
-            category: 'STATIONERY',
-            price: '680,000 VND',
-            image: '/assets/re_tray.png'
-        },
-        {
-            id: 4,
-            title: language === 'vi' ? 'Đồng hồ treo tường RE:TIME' : 'RE:TIME Wall Clock',
-            category: 'DECOR',
-            price: '1,200,000 VND',
-            image: '/assets/bloom_clock.png'
+        // 1. Fetch Product details by slug
+        fetch(`/api/Products/slug/${slug}`)
+            .then(res => {
+                if (!res.ok) throw new Error('Product not found');
+                return res.json();
+            })
+            .then(resData => {
+                if (resData && resData.success && resData.data) {
+                    setDbProduct(resData.data);
+                } else if (resData && resData.data) {
+                    setDbProduct(resData.data);
+                } else {
+                    setDbProduct(resData);
+                }
+                setSelectedImageIdx(0);
+            })
+            .catch(err => {
+                console.error('Error loading product details:', err);
+                setDbProduct(null);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+
+        // 2. Fetch Related products from public API
+        fetch('/api/Products')
+            .then(res => res.json())
+            .then(resData => {
+                const list = Array.isArray(resData) ? resData : (resData?.data || []);
+                const filtered = list
+                    .filter((p: any) => p.slug !== slug && p.isActive !== false)
+                    .slice(0, 4)
+                    .map((p: any) => ({
+                        id: p.id,
+                        slug: p.slug || p.id,
+                        title: p.name,
+                        category: (p.categoryName || p.category?.name || 'DECOR').toUpperCase(),
+                        price: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price),
+                        image: p.thumbnailUrl || p.image || (p.images && p.images[0]?.imageUrl) || '/assets/re_cup.png'
+                    }));
+                setRelatedProducts(filtered);
+            })
+            .catch(err => {
+                console.error('Error loading related products:', err);
+                setRelatedProducts([]);
+            });
+    }, [slug, language]);
+
+    const handleAddToCart = async () => {
+        if (!isAuthenticated) {
+            openLoginModal('addToCart');
+            return;
         }
-    ]
-
-    const handleAddToCart = () => {
-        alert(language === 'vi' 
-            ? `Đã thêm ${quantity} sản phẩm "Bình hoa bã cà phê Heritage" vào giỏ hàng!`
-            : `Added ${quantity} "Heritage Coffee-Ground Vase" items to cart!`
-        )
+        if (!dbProduct) return;
+        
+        await addToCart({
+            id: dbProduct.id,
+            productId: dbProduct.id,
+            name: dbProduct.name,
+            slug: dbProduct.slug,
+            price: dbProduct.price,
+            salePrice: dbProduct.salePrice,
+            image: dbProduct.images && dbProduct.images.length > 0 
+                ? dbProduct.images[0].imageUrl 
+                : '/assets/re_cup.png',
+            material: dbProduct.material || (language === 'vi' ? 'Bã cà phê tái chế sinh học' : 'Bio-recycled coffee grounds'),
+            size: dbProduct.size || 'Standard'
+        }, quantity);
     }
 
-    const handleBuyNow = () => {
-        alert(language === 'vi'
-            ? `Tiến hành thanh toán cho ${quantity} sản phẩm "Bình hoa bã cà phê Heritage"!`
-            : `Proceeding to checkout for ${quantity} "Heritage Coffee-Ground Vase" items!`
-        )
+    const handleBuyNow = async () => {
+        if (!isAuthenticated) {
+            openLoginModal('addToCart');
+            return;
+        }
+        if (!dbProduct) return;
+
+        await addToCart({
+            id: dbProduct.id,
+            productId: dbProduct.id,
+            name: dbProduct.name,
+            slug: dbProduct.slug,
+            price: dbProduct.price,
+            salePrice: dbProduct.salePrice,
+            image: dbProduct.images && dbProduct.images.length > 0
+                ? dbProduct.images[0].imageUrl
+                : '/assets/re_cup.png',
+            material: dbProduct.material || (language === 'vi' ? 'Bã cà phê tái chế sinh học' : 'Bio-recycled coffee grounds'),
+            size: dbProduct.size || 'Standard'
+        }, quantity);
+
+        navigate('/checkout');
     }
+
+    if (loading) {
+        return (
+            <div className="page-product-detail" style={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                minHeight: '60vh', 
+                gap: '1.25rem'
+            }}>
+                <div style={{
+                    width: '40px',
+                    height: '40px',
+                    border: '3px solid #f0e8e0',
+                    borderTop: '3px solid #657b35',
+                    borderRadius: '50%',
+                    animation: 'spin 1s linear infinite'
+                }} />
+                <style>{`
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                `}</style>
+                <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem', fontWeight: 600, letterSpacing: '0.5px' }}>
+                    {language === 'vi' ? 'ĐANG TẢI THÔNG TIN SẢN PHẨM...' : 'LOADING PRODUCT DETAILS...'}
+                </div>
+            </div>
+        );
+    }
+
+    if (!dbProduct) {
+        return (
+            <div className="page-product-detail" style={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                justifyContent: 'center', 
+                alignItems: 'center', 
+                minHeight: '60vh', 
+                gap: '1rem',
+                color: 'var(--text-muted)',
+                padding: '2rem'
+            }}>
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ color: '#c83a42' }}>
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div style={{ fontSize: '1.2rem', fontWeight: 600 }}>
+                    {language === 'vi' ? 'Không tìm thấy sản phẩm yêu cầu' : 'Requested product not found'}
+                </div>
+                <Link to="/products" style={{ color: '#657b35', fontWeight: 600, textDecoration: 'underline', marginTop: '0.5rem' }}>
+                    {language === 'vi' ? 'Quay lại cửa hàng' : 'Back to shop'}
+                </Link>
+            </div>
+        );
+    }
+
+    // Build the images gallery dynamically from actual API data
+    const images = dbProduct.images && dbProduct.images.length > 0
+        ? dbProduct.images.map((img) => img.imageUrl)
+        : ['/assets/re_vase.png'];
+
+    const categoryName = dbProduct.category?.name || 'Decor';
 
     return (
         <div className="page-product-detail">
@@ -68,7 +222,7 @@ const ProductDetail: React.FC = () => {
                 <span className="breadcrumb-separator">›</span>
                 <Link to="/products">{t('detail.breadcrumbsProducts')}</Link>
                 <span className="breadcrumb-separator">›</span>
-                <span>{language === 'vi' ? 'Bình hoa bã cà phê Heritage' : 'Heritage Coffee-Ground Vase'}</span>
+                <span>{dbProduct.name}</span>
             </nav>
 
             {/* Main Detail Layout */}
@@ -88,74 +242,18 @@ const ProductDetail: React.FC = () => {
                         ))}
                     </div>
                     <div className="detail-main-image-view">
-                        <img src={images[selectedImageIdx]} alt="Heritage Coffee-Ground Vase main view" />
+                        <img src={images[selectedImageIdx]} alt={`${dbProduct.name} main view`} />
                     </div>
                 </div>
 
                 {/* Right side: Product info card */}
-                <div className="detail-info-card">
-                    <span className="detail-badge-tag">{language === 'vi' ? 'BỘ SƯU TẬP MỚI' : 'NEW COLLECTION'}</span>
-                    <h1 className="detail-title">
-                        {language === 'vi' ? 'Bình hoa bã cà phê Heritage' : 'Heritage Coffee-Ground Vase'}
-                    </h1>
-                    
-                    <div className="detail-price-line">
-                        <span>850,000 VND</span>
-                        <span className="detail-price-desc">{t('detail.recycledDesc')}</span>
-                    </div>
-
-                    <div className="detail-description-block">
-                        <h3 className="detail-section-title">{t('detail.detailTitle')}</h3>
-                        <p>
-                            {language === 'vi'
-                                ? 'Bình gốm thủ công được chế tác từ bã cà phê tái chế từ chuỗi Highlands Coffee. Với công nghệ nén áp suất cao và chất liên kết sinh học, mỗi sản phẩm mang một vân sắc độc bản, kể câu chuyện về vòng đời mới của hạt cà phê Việt.'
-                                : 'Handcrafted ceramic vase made from recycled coffee grounds from Highlands Coffee chain. With high-pressure technology and bio-binder, each product carries a unique grain, telling the new life cycle story of Vietnamese coffee beans.'}
-                        </p>
-                    </div>
-
-                    <div className="detail-specs-grid">
-                        <div>
-                            <div className="detail-spec-label">{t('detail.specsMaterial')}</div>
-                            <div className="detail-spec-val">{t('detail.specsMaterialVal')}</div>
-                        </div>
-                        <div>
-                            <div className="detail-spec-label">{t('detail.specsSize')}</div>
-                            <div className="detail-spec-val">{t('detail.specsSizeVal')}</div>
-                        </div>
-                    </div>
-
-                    <div className="detail-warning-box">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"></path>
-                        </svg>
-                        <p>{t('detail.warning')}</p>
-                    </div>
-
-                    <div className="detail-actions-block">
-                        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <span className="detail-spec-label" style={{ marginBottom: 0 }}>{t('detail.quantity')}</span>
-                            <div className="quantity-box-selector">
-                                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} aria-label="Decrease quantity">−</button>
-                                <input
-                                    type="number"
-                                    value={quantity}
-                                    onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-                                />
-                                <button onClick={() => setQuantity(quantity + 1)} aria-label="Increase quantity">+</button>
-                            </div>
-                        </div>
-
-                        <button className="btn-add-cart-solid" onClick={handleAddToCart}>
-                            <svg viewBox="0 0 24 24">
-                                <circle cx="9" cy="21" r="1"></circle>
-                                <circle cx="20" cy="21" r="1"></circle>
-                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                            </svg>
-                            {t('detail.addToCart')}
-                        </button>
-                        <button className="btn-buy-now" onClick={handleBuyNow}>{t('detail.buyNow')}</button>
-                    </div>
-                </div>
+                <ProductInfoCard 
+                    dbProduct={dbProduct}
+                    quantity={quantity}
+                    setQuantity={setQuantity}
+                    handleAddToCart={handleAddToCart}
+                    handleBuyNow={handleBuyNow}
+                />
             </div>
 
             {/* Visual story section */}
@@ -204,52 +302,54 @@ const ProductDetail: React.FC = () => {
             </section>
 
             {/* Related products grid */}
-            <section className="related-prod-section">
-                <div className="related-prod-container">
-                    <div className="related-prod-header">
-                        <div>
-                            <h3>{t('detail.relatedTitle')}</h3>
-                            <h2>{t('detail.relatedSub')}</h2>
+            {relatedProducts.length > 0 && (
+                <section className="related-prod-section">
+                    <div className="related-prod-container">
+                        <div className="related-prod-header">
+                            <div>
+                                <h3>{t('detail.relatedTitle')}</h3>
+                                <h2>{t('detail.relatedSub')}</h2>
+                            </div>
+                            <div className="related-arrows">
+                                <button className="arrow-circle" aria-label="Previous Related Items">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <polyline points="15 18 9 12 15 6"></polyline>
+                                    </svg>
+                                </button>
+                                <button className="arrow-circle" aria-label="Next Related Items">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
-                        <div className="related-arrows">
-                            <button className="arrow-circle" aria-label="Previous Related Items">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <polyline points="15 18 9 12 15 6"></polyline>
-                                </svg>
-                            </button>
-                            <button className="arrow-circle" aria-label="Next Related Items">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                    <polyline points="9 18 15 12 9 6"></polyline>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
 
-                    <div className="related-grid-four">
-                        {relatedProducts.map((p) => (
-                            <Link key={p.id} to={`/products/${p.id}`} className="brand-product-card">
-                                <div className="card-img-wrapper">
-                                    <img src={p.image} alt={p.title} />
-                                </div>
-                                <div className="card-content">
-                                    <span className="card-category">{p.category}</span>
-                                    <h3 className="card-title">{p.title}</h3>
-                                    <div className="card-footer">
-                                        <span className="card-price" style={{ fontSize: '1rem' }}>{p.price}</span>
-                                        <button className="btn-add-to-cart" title={t('detail.addToCart')}>
-                                            <svg viewBox="0 0 24 24">
-                                                <circle cx="9" cy="21" r="1"></circle>
-                                                <circle cx="20" cy="21" r="1"></circle>
-                                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                                            </svg>
-                                        </button>
+                        <div className="related-grid-four">
+                            {relatedProducts.map((p) => (
+                                <Link key={p.id} to={`/products/${p.slug}`} className="brand-product-card">
+                                    <div className="card-img-wrapper">
+                                        <img src={p.image} alt={p.title} />
                                     </div>
-                                </div>
-                            </Link>
-                        ))}
+                                    <div className="card-content">
+                                        <span className="card-category">{p.category}</span>
+                                        <h3 className="card-title">{p.title}</h3>
+                                        <div className="card-footer">
+                                            <span className="card-price" style={{ fontSize: '1rem' }}>{p.price}</span>
+                                            <button className="btn-add-to-cart" title={t('detail.addToCart')}>
+                                                <svg viewBox="0 0 24 24">
+                                                    <circle cx="9" cy="21" r="1"></circle>
+                                                    <circle cx="20" cy="21" r="1"></circle>
+                                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
+            )}
 
         </div>
     )

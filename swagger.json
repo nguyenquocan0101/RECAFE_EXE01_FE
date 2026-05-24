@@ -261,87 +261,12 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "required": [
-                  "CategoryId",
-                  "Name",
-                  "Price",
-                  "SKU",
-                  "Slug"
-                ],
                 "type": "object",
                 "properties": {
-                  "CategoryId": {
-                    "type": "string",
-                    "format": "uuid"
-                  },
-                  "Name": {
-                    "maxLength": 150,
-                    "minLength": 0,
+                  "payload": {
                     "type": "string"
                   },
-                  "Slug": {
-                    "maxLength": 200,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "SKU": {
-                    "maxLength": 50,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "Price": {
-                    "maximum": 1.7976931348623157E+308,
-                    "minimum": 0,
-                    "type": "number",
-                    "format": "double"
-                  },
-                  "SalePrice": {
-                    "maximum": 1.7976931348623157E+308,
-                    "minimum": 0,
-                    "type": "number",
-                    "format": "double"
-                  },
-                  "ShortDescription": {
-                    "maxLength": 500,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "Description": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "Material": {
-                    "maxLength": 200,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "Size": {
-                    "maxLength": 100,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "UsageNote": {
-                    "maxLength": 500,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "IsPersonalizable": {
-                    "type": "boolean"
-                  },
-                  "IsActive": {
-                    "type": "boolean"
-                  },
-                  "RewardPoints": {
-                    "maximum": 2147483647,
-                    "minimum": 0,
-                    "type": "integer",
-                    "format": "int32"
-                  },
-                  "ImageFolder": {
-                    "type": "string"
-                  },
-                  "Images": {
+                  "imageUrls": {
                     "type": "array",
                     "items": {
                       "type": "string",
@@ -351,52 +276,10 @@
                 }
               },
               "encoding": {
-                "CategoryId": {
+                "payload": {
                   "style": "form"
                 },
-                "Name": {
-                  "style": "form"
-                },
-                "Slug": {
-                  "style": "form"
-                },
-                "SKU": {
-                  "style": "form"
-                },
-                "Price": {
-                  "style": "form"
-                },
-                "SalePrice": {
-                  "style": "form"
-                },
-                "ShortDescription": {
-                  "style": "form"
-                },
-                "Description": {
-                  "style": "form"
-                },
-                "Material": {
-                  "style": "form"
-                },
-                "Size": {
-                  "style": "form"
-                },
-                "UsageNote": {
-                  "style": "form"
-                },
-                "IsPersonalizable": {
-                  "style": "form"
-                },
-                "IsActive": {
-                  "style": "form"
-                },
-                "RewardPoints": {
-                  "style": "form"
-                },
-                "ImageFolder": {
-                  "style": "form"
-                },
-                "Images": {
+                "imageUrls": {
                   "style": "form"
                 }
               }
@@ -430,90 +313,12 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "required": [
-                  "CategoryId",
-                  "Name",
-                  "Price",
-                  "SKU",
-                  "Slug"
-                ],
                 "type": "object",
                 "properties": {
-                  "CategoryId": {
-                    "type": "string",
-                    "format": "uuid"
-                  },
-                  "Name": {
-                    "maxLength": 150,
-                    "minLength": 0,
+                  "payload": {
                     "type": "string"
                   },
-                  "Slug": {
-                    "maxLength": 200,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "SKU": {
-                    "maxLength": 50,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "Price": {
-                    "maximum": 1.7976931348623157E+308,
-                    "minimum": 0,
-                    "type": "number",
-                    "format": "double"
-                  },
-                  "SalePrice": {
-                    "maximum": 1.7976931348623157E+308,
-                    "minimum": 0,
-                    "type": "number",
-                    "format": "double"
-                  },
-                  "ShortDescription": {
-                    "maxLength": 500,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "Description": {
-                    "maxLength": 2000,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "Material": {
-                    "maxLength": 200,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "Size": {
-                    "maxLength": 100,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "UsageNote": {
-                    "maxLength": 500,
-                    "minLength": 0,
-                    "type": "string"
-                  },
-                  "IsPersonalizable": {
-                    "type": "boolean"
-                  },
-                  "IsActive": {
-                    "type": "boolean"
-                  },
-                  "RewardPoints": {
-                    "maximum": 2147483647,
-                    "minimum": 0,
-                    "type": "integer",
-                    "format": "int32"
-                  },
-                  "ReplaceImages": {
-                    "type": "boolean"
-                  },
-                  "ImageFolder": {
-                    "type": "string"
-                  },
-                  "Images": {
+                  "imageUrls": {
                     "type": "array",
                     "items": {
                       "type": "string",
@@ -523,55 +328,10 @@
                 }
               },
               "encoding": {
-                "CategoryId": {
+                "payload": {
                   "style": "form"
                 },
-                "Name": {
-                  "style": "form"
-                },
-                "Slug": {
-                  "style": "form"
-                },
-                "SKU": {
-                  "style": "form"
-                },
-                "Price": {
-                  "style": "form"
-                },
-                "SalePrice": {
-                  "style": "form"
-                },
-                "ShortDescription": {
-                  "style": "form"
-                },
-                "Description": {
-                  "style": "form"
-                },
-                "Material": {
-                  "style": "form"
-                },
-                "Size": {
-                  "style": "form"
-                },
-                "UsageNote": {
-                  "style": "form"
-                },
-                "IsPersonalizable": {
-                  "style": "form"
-                },
-                "IsActive": {
-                  "style": "form"
-                },
-                "RewardPoints": {
-                  "style": "form"
-                },
-                "ReplaceImages": {
-                  "style": "form"
-                },
-                "ImageFolder": {
-                  "style": "form"
-                },
-                "Images": {
+                "imageUrls": {
                   "style": "form"
                 }
               }

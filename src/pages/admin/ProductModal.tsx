@@ -36,6 +36,7 @@ const emptyForm = {
     name: '', slug: '', sku: '', price: 0, salePrice: '' as string | number,
     categoryId: '', shortDescription: '', description: '',
     isPersonalizable: false, isActive: true, rewardPoints: 0,
+    material: '', size: '',
 };
 
 export const ProductModal: React.FC<ProductModalProps> = ({
@@ -95,6 +96,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                     isPersonalizable: editTarget.isPersonalizable ?? false,
                     isActive: editTarget.isActive ?? true,
                     rewardPoints: editTarget.rewardPoints ?? 0,
+                    material: editTarget.material || '',
+                    size: editTarget.size || '',
                 });
                 setImagePreview(editTarget.thumbnailUrl || editTarget.image || null);
             } else {
@@ -145,11 +148,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         if (form.description) {
             formData.append('Description', form.description);
         }
-        if (editTarget?.material) {
-            formData.append('Material', editTarget.material);
+        if (form.material) {
+            formData.append('Material', form.material);
         }
-        if (editTarget?.size) {
-            formData.append('Size', editTarget.size);
+        if (form.size) {
+            formData.append('Size', form.size);
         }
         if (editTarget?.usageNote) {
             formData.append('UsageNote', editTarget.usageNote);
@@ -251,6 +254,30 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                         <div>
                             <label className="block text-[10px] font-bold text-[#68361c]/70 uppercase tracking-widest mb-1.5">Điểm tích lũy</label>
                             <input type="number" min={0} value={form.rewardPoints} onChange={e => setForm(f => ({ ...f, rewardPoints: Number(e.target.value) }))} className="w-full px-4 py-2.5 border border-[#e8ddd5] rounded text-[#4b2311] text-sm focus:outline-none focus:border-[#657b35] transition-all" />
+                        </div>
+                    </div>
+
+                    {/* Material & Size */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-[10px] font-bold text-[#68361c]/70 uppercase tracking-widest mb-1.5">Chất liệu</label>
+                            <input
+                                type="text"
+                                value={form.material}
+                                onChange={e => setForm(f => ({ ...f, material: e.target.value }))}
+                                placeholder="Ví dụ: Gỗ + Bã cà phê tái chế"
+                                className="w-full px-4 py-2.5 border border-[#e8ddd5] rounded text-[#4b2311] text-sm focus:outline-none focus:border-[#657b35] transition-all"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-[10px] font-bold text-[#68361c]/70 uppercase tracking-widest mb-1.5">Kích thước</label>
+                            <input
+                                type="text"
+                                value={form.size}
+                                onChange={e => setForm(f => ({ ...f, size: e.target.value }))}
+                                placeholder="Ví dụ: H: 25cm | D: 12cm"
+                                className="w-full px-4 py-2.5 border border-[#e8ddd5] rounded text-[#4b2311] text-sm focus:outline-none focus:border-[#657b35] transition-all"
+                            />
                         </div>
                     </div>
 

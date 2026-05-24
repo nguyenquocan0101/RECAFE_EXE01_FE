@@ -2944,3 +2944,58 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: #4b2311 !important;
   transition: background-color 5000s ease-in-out 0s;
 }
+
+/* Custom Robust Quantity Selector styling */
+.detail-quantity-selector {
+  display: flex !important;
+  align-items: center !important;
+  border: 1px solid #eaddd2 !important;
+  border-radius: var(--radius-full) !important;
+  background-color: var(--white) !important;
+  overflow: hidden !important;
+  width: fit-content !important;
+}
+
+.detail-quantity-selector button {
+  border: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  padding: 0.35rem 0.85rem !important;
+  font-weight: 800 !important;
+  color: var(--text-muted) !important;
+  transition: background-color var(--transition-fast) !important;
+  border-radius: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.detail-quantity-selector button:hover {
+  background-color: #f3ede7 !important;
+}
+
+.detail-quantity-selector input {
+  border: none !important;
+  outline: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  text-align: center !important;
+  font-weight: 800 !important;
+  font-size: 0.875rem !important;
+  color: var(--text-dark) !important;
+  width: 2.5rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  -moz-appearance: textfield !important;
+}
+
+.detail-quantity-selector input::-webkit-outer-spin-button,
+.detail-quantity-selector input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+

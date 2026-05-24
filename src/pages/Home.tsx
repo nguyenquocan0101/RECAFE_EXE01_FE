@@ -1,9 +1,15 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '@/context/LanguageContext'
+import { useAuth } from '@/context/AuthContext'
+import { useCart } from '@/context/CartContext'
+import { useToast } from '@/context/ToastContext'
 
 const Home: React.FC = () => {
     const { t, language } = useLanguage()
+    const { isAuthenticated, openLoginModal } = useAuth()
+    const { addToCart } = useCart()
+    const { showToast } = useToast()
 
     const featuredProducts = [
         {
@@ -148,7 +154,27 @@ const Home: React.FC = () => {
                                 <p className="card-description">{p.description}</p>
                                 <div className="card-footer">
                                     <span className="card-price">{p.price}</span>
-                                    <button className="btn-add-to-cart" title={t('detail.addToCart')} onClick={() => alert(`Added ${p.title} to cart!`)}>
+                                    <button 
+                                        className="btn-add-to-cart" 
+                                        title={t('detail.addToCart')} 
+                                        onClick={async (e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            if (!isAuthenticated) {
+                                                openLoginModal('addToCart');
+                                                return;
+                                            }
+                                            await addToCart({
+                                                id: p.id.toString(),
+                                                productId: p.id.toString(),
+                                                name: p.title,
+                                                slug: p.title.toLowerCase().replace(/\s+/g, '-'),
+                                                price: parseInt(p.price.replace(/[^\d]/g, '')),
+                                                image: p.image
+                                            }, 1);
+                                            showToast(language === 'vi' ? `Đã thêm ${p.title} vào giỏ` : `Added ${p.title} to cart`, 'success');
+                                        }}
+                                    >
                                         <svg viewBox="0 0 24 24">
                                             <circle cx="9" cy="21" r="1"></circle>
                                             <circle cx="20" cy="21" r="1"></circle>

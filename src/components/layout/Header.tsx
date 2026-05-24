@@ -1,15 +1,16 @@
 import React, { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useAuth } from '@/context/AuthContext'
-import LoginModal from '@/components/auth/LoginModal'
 import { useToast } from '@/context/ToastContext'
+import { useCart } from '@/context/CartContext'
 
 const Header: React.FC = () => {
     const { language, toggleLanguage, t } = useLanguage()
-    const { user, isAuthenticated, isAdmin, isStaff, logout } = useAuth()
+    const { user, isAuthenticated, isAdmin, isStaff, logout, openLoginModal } = useAuth()
     const { showToast } = useToast()
-    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false)
+    const { cartCount } = useCart()
+    const navigate = useNavigate()
     const [dropdownOpen, setDropdownOpen] = useState(false)
 
     const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -84,6 +85,22 @@ const Header: React.FC = () => {
                         </button>
                     </div>
 
+                    {/* Premium Cart Button */}
+                    <button 
+                        id="cart-icon-btn"
+                        onClick={() => navigate('/checkout')}
+                        className="relative flex items-center justify-center w-10 h-10 rounded-full bg-primary text-white hover:bg-primary-hover transition-colors shadow-md shadow-primary/10 cursor-pointer border-none outline-none"
+                        style={{ border: 'none', outline: 'none', boxShadow: 'none' }}
+                        aria-label="Shopping Cart"
+                    >
+                        <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>shopping_bag</span>
+                        {cartCount > 0 && (
+                            <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#c83a42] text-[9px] font-extrabold text-white border-2 border-white">
+                                {cartCount}
+                            </span>
+                        )}
+                    </button>
+
                     {isAuthenticated && user ? (
                         <div className="relative">
                             <button
@@ -143,18 +160,13 @@ const Header: React.FC = () => {
                     ) : (
                         <button 
                             className="btn-contact bg-primary text-white border-none py-2 px-6 rounded-full text-[0.9rem] font-semibold cursor-pointer transition-all duration-200 hover:bg-primary-hover hover:-translate-y-[1px]" 
-                            onClick={() => setIsLoginModalOpen(true)}
+                            onClick={() => openLoginModal()}
                         >
                             {t('header.login')}
                         </button>
                     )}
                 </div>
             </div>
-            
-            <LoginModal 
-                isOpen={isLoginModalOpen} 
-                onClose={() => setIsLoginModalOpen(false)} 
-            />
         </header>
     )
 }

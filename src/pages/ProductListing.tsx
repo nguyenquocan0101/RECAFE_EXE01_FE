@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '@/context/LanguageContext'
+import { useAuth } from '@/context/AuthContext'
+import { useCart } from '@/context/CartContext'
+import { useToast } from '@/context/ToastContext'
 
 interface Product {
     id: number | string
+    slug: string
     title: string
     price: number
     description: string
@@ -17,94 +21,18 @@ interface Product {
 
 const ProductListing: React.FC = () => {
     const { t, language } = useLanguage()
+    const { isAuthenticated, openLoginModal } = useAuth()
+    const { addToCart } = useCart()
+    const { showToast } = useToast()
     const [priceRange, setPriceRange] = useState(150)
     const [selectedCategories, setSelectedCategories] = useState<string[]>([])
     const [selectedCollection, setSelectedCollection] = useState<string>('')
+    const [currentPage, setCurrentPage] = useState(1)
+    const ITEMS_PER_PAGE = 6;
 
-    const products: Product[] = [
-        {
-            id: 1,
-            title: language === 'vi' ? 'Bộ khay kệ Espresso' : 'Espresso Desk Set',
-            price: 85,
-            description: language === 'vi' 
-                ? 'Bộ khay đựng đồ văn phòng làm bằng bã cà phê, thiết kế tối giản...'
-                : 'Handcrafted desk organizer set featuring a minimalist...',
-            image: '/assets/re_tray.png',
-            badge: language === 'vi' ? 'MỚI VỀ' : 'NEW ARRIVAL',
-            tags: ['Decor', 'Handmade'],
-            inStock: true,
-            category: 'Decor',
-            collection: 'New Arrivals'
-        },
-        {
-            id: 2,
-            title: language === 'vi' ? 'Đồng hồ treo tường Bloom' : 'Bloom Wall Clock',
-            price: 120,
-            description: language === 'vi'
-                ? 'Đồng hồ treo tường kim trôi tĩnh âm, thiết kế từ chất liệu bã cà phê...'
-                : 'A silent, statement wall clock designed with high-...',
-            image: '/assets/bloom_clock.png',
-            badge: language === 'vi' ? 'BÁN CHẠY' : 'BEST SELLER',
-            tags: ['Decor', 'Eco-friendly'],
-            inStock: true,
-            category: 'Decor',
-            collection: 'Best Sellers'
-        },
-        {
-            id: 3,
-            title: language === 'vi' ? 'Bộ lót ly Origin (Bộ 4 chiếc)' : 'Origin Coasters (Set of 4)',
-            price: 45,
-            description: language === 'vi'
-                ? 'Đế lót ly khắc laser sắc nét từ chất liệu bã cà phê ép...'
-                : 'Precision laser-etched coasters featuring...',
-            image: '/assets/re_cup.png',
-            badge: language === 'vi' ? 'HẾT HÀNG' : 'OUT OF STOCK',
-            tags: ['Gifts', 'Handmade'],
-            inStock: false,
-            category: 'Gifts',
-            collection: 'Best Sellers'
-        },
-        {
-            id: 4,
-            title: language === 'vi' ? 'Chậu cây để bàn Aroma' : 'Aroma Table Planter',
-            price: 32,
-            description: language === 'vi'
-                ? 'Chậu cây bã cà phê thoáng khí, mang sắc xanh tự nhiên cho căn phòng...'
-                : 'Breathable, eco-friendly planter that provides natu...',
-            image: '/assets/re_vase.png',
-            tags: ['Decor', 'Eco-friendly'],
-            inStock: true,
-            category: 'Decor',
-            collection: 'New Arrivals'
-        },
-        {
-            id: 5,
-            title: language === 'vi' ? 'Bộ nến thơm Vessel' : 'Vessel Candle Set',
-            price: 58,
-            description: language === 'vi'
-                ? 'Bộ ba cốc nến sáp đậu nành cao cấp phảng phất hương vị Arabica...'
-                : 'A trio of soy-wax candles with scents of Arabica and...',
-            image: '/assets/re_glow.png',
-            tags: ['Gifts', 'Handmade'],
-            inStock: true,
-            category: 'Gifts',
-            collection: 'Best Sellers'
-        },
-        {
-            id: 6,
-            title: language === 'vi' ? 'Thìa đong định lượng Artisan' : 'Artisan Measuring Scoop',
-            price: 24,
-            description: language === 'vi'
-                ? 'Thìa đong định lượng bằng gỗ và bã cà phê, khắc cán theo yêu cầu...'
-                : 'Precision scoop with a custom engraved handle...',
-            image: '/assets/re_cup.png',
-            badge: language === 'vi' ? 'THIẾT KẾ RIÊNG' : 'PERSONALIZED',
-            tags: ['Handmade', 'Eco-friendly'],
-            inStock: true,
-            category: 'Limited Edition',
-            collection: 'Personalized'
-        }
-    ]
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [selectedCategories, selectedCollection, priceRange]);
 
     const [dbProducts, setDbProducts] = useState<any[]>([])
 
@@ -125,6 +53,7 @@ const ProductListing: React.FC = () => {
 
         return {
             id: p.id,
+            slug: p.slug || String(p.id),
             title: p.name,
             price: p.price,
             description: p.shortDescription || p.description || 'Sản phẩm làm từ bã cà phê tái chế.',
@@ -137,7 +66,7 @@ const ProductListing: React.FC = () => {
         };
     });
 
-    const allProducts = dbProducts.length > 0 ? mappedProducts : products;
+    const allProducts = mappedProducts;
 
     const handleCategoryChange = (category: string) => {
         if (selectedCategories.includes(category)) {
@@ -154,6 +83,10 @@ const ProductListing: React.FC = () => {
         if (selectedCollection && product.collection !== selectedCollection) return false
         return true
     })
+
+    const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE);
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const paginatedProducts = filteredProducts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
     const getCategoryLabel = (cat: string) => {
         if (cat === 'Decor') return language === 'vi' ? 'Trang trí' : 'Decor'
@@ -270,9 +203,9 @@ const ProductListing: React.FC = () => {
                         </div>
                     ) : (
                         <div className="products-grid-list">
-                            {filteredProducts.map(product => (
+                            {paginatedProducts.map(product => (
                                 <div key={product.id} className="product-card-wrap">
-                                    <Link to={`/products/${product.id}`} className="brand-product-card">
+                                    <Link to={`/products/${product.slug}`} className="brand-product-card">
                                         {!product.inStock && (
                                             <div className="out-of-stock-overlay">
                                                 <span className="out-of-stock-banner">{language === 'vi' ? 'HẾT HÀNG' : 'OUT OF STOCK'}</span>
@@ -293,7 +226,27 @@ const ProductListing: React.FC = () => {
                                             <div className="card-footer" onClick={(e) => e.stopPropagation()}>
                                                 <span className="card-price">{product.price > 1000 ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) : `$${product.price}.00`}</span>
                                                 {product.inStock ? (
-                                                    <button className="btn-add-to-cart" title={t('detail.addToCart')} onClick={() => alert(`Added ${product.title} to cart!`)}>
+                                                    <button 
+                                                        className="btn-add-to-cart" 
+                                                        title={t('detail.addToCart')} 
+                                                        onClick={async (e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            if (!isAuthenticated) {
+                                                                openLoginModal('addToCart');
+                                                                return;
+                                                            }
+                                                            await addToCart({
+                                                                id: product.id as string,
+                                                                productId: product.id as string,
+                                                                name: product.title,
+                                                                slug: product.slug,
+                                                                price: product.price,
+                                                                image: product.image
+                                                            }, 1);
+                                                            showToast(language === 'vi' ? `Đã thêm ${product.title} vào giỏ` : `Added ${product.title} to cart`, 'success');
+                                                        }}
+                                                    >
                                                         <svg viewBox="0 0 24 24">
                                                             <circle cx="9" cy="21" r="1"></circle>
                                                             <circle cx="20" cy="21" r="1"></circle>
@@ -324,21 +277,55 @@ const ProductListing: React.FC = () => {
                     )}
 
                     {/* Pagination */}
-                    <div className="pagination-wrapper">
-                        <button className="page-arrow" aria-label="Previous Page">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                <polyline points="15 18 9 12 15 6"></polyline>
-                            </svg>
-                        </button>
-                        <button className="page-number active">1</button>
-                        <button className="page-number">2</button>
-                        <button className="page-number">3</button>
-                        <button className="page-arrow" aria-label="Next Page">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </button>
-                    </div>
+                    {totalPages > 1 && (
+                        <div className="pagination-wrapper">
+                            <button 
+                                className="page-arrow" 
+                                aria-label="Previous Page"
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                style={{ 
+                                    opacity: currentPage === 1 ? 0.5 : 1, 
+                                    cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                                    border: 'none',
+                                    outline: 'none'
+                                }}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                    <polyline points="15 18 9 12 15 6"></polyline>
+                                </svg>
+                            </button>
+                            {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((page) => (
+                                <button
+                                    key={page}
+                                    className={`page-number ${currentPage === page ? 'active' : ''}`}
+                                    onClick={() => setCurrentPage(page)}
+                                    style={{
+                                        border: 'none',
+                                        outline: 'none'
+                                    }}
+                                >
+                                    {page}
+                                </button>
+                            ))}
+                            <button 
+                                className="page-arrow" 
+                                aria-label="Next Page"
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage === totalPages}
+                                style={{ 
+                                    opacity: currentPage === totalPages ? 0.5 : 1, 
+                                    cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                                    border: 'none',
+                                    outline: 'none'
+                                }}
+                            >
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    )}
                 </main>
             </div>
 

@@ -6,9 +6,10 @@ import { useToast } from '@/context/ToastContext';
 interface LoginModalProps {
     isOpen: boolean;
     onClose: () => void;
+    reason?: string;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, reason }) => {
     const { login, register, isLoading } = useAuth();
     const { showToast } = useToast();
     const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -43,7 +44,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             resetFields();
             onClose();
         } catch (err: any) {
-            setError(err.message || `${mode === 'login' ? 'Login' : 'Registration'} failed.`);
+            setError(err.message || `${mode === 'login' ? 'Đăng nhập' : 'Đăng ký'} không thành công.`);
         }
     };
 
@@ -73,7 +74,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     return createPortal(
         /* Backdrop: Transparent overlay with ONLY blur effect, no brown color scale as requested */
         <div className="fixed inset-0 bg-black/[0.04] backdrop-blur-[10px] flex items-center justify-center z-[1000]" onClick={handleBackdropClick}>
-            <div className="bg-white p-8 rounded-[2rem] shadow-2xl w-full max-w-[460px] border border-[#e8ddd5] relative mx-4 animate-pop-from-button">
+            <div className="bg-white p-8 rounded shadow-2xl w-full max-w-[460px] border border-[#e8ddd5] relative mx-4 animate-pop-from-button">
                 {/* Close Button */}
                 <button 
                     className="absolute top-6 right-6 w-8 h-8 bg-gray-100/70 border-none text-gray-400 cursor-pointer flex items-center justify-center rounded-full transition-all duration-200 hover:bg-gray-200/80 hover:text-gray-700 outline-none" 
@@ -89,11 +90,15 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 
                 {/* Header Title Section */}
                 <div className="mb-5">
-                    <h2 className="text-2xl font-extrabold text-gray-900 flex items-center gap-1.5 tracking-tight">
-                        {mode === 'login' ? 'Welcome back' : 'Create account'}
+                    <h2 className="text-2xl font-extrabold text-[#4b2311] flex items-center gap-1.5 tracking-tight">
+                        {reason === 'addToCart'
+                            ? (mode === 'login' ? 'Đăng nhập' : 'Đăng ký tài khoản')
+                            : (mode === 'login' ? 'Chào mừng trở lại' : 'Tạo tài khoản')}
                     </h2>
-                    <p className="text-gray-400 text-xs mt-1 font-semibold">
-                        {mode === 'login' ? 'Please sign in to continue' : 'Please fill in the details to register'}
+                    <p className="text-[#68361c] text-xs mt-1 font-semibold">
+                        {reason === 'addToCart' 
+                            ? (mode === 'login' ? 'Hãy đăng nhập để mua sản phẩm' : 'Hãy đăng ký tài khoản để mua sản phẩm')
+                            : (mode === 'login' ? 'Vui lòng đăng nhập để tiếp tục' : 'Vui lòng điền thông tin chi tiết để đăng ký')}
                     </p>
                 </div>
                 
@@ -104,7 +109,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                         onClick={() => toggleMode('login')}
                         className={`flex-1 py-2.5 font-bold text-center rounded-lg text-[10px] tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-1.5 outline-none ${
                             mode === 'login' 
-                                ? 'bg-white shadow-sm border border-[#e8ddd5] text-[#657b35]' 
+                                ? 'bg-white shadow-sm border border-[#e8ddd5] text-[#68361c]' 
                                 : 'border-transparent text-gray-400 hover:text-gray-600 bg-transparent'
                         }`}
                         style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
@@ -113,14 +118,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                             <circle cx="12" cy="7" r="4" />
                         </svg>
-                        SIGN IN
+                        ĐĂNG NHẬP
                     </button>
                     <button 
                         type="button"
                         onClick={() => toggleMode('register')}
                         className={`flex-1 py-2.5 font-bold text-center rounded-lg text-[10px] tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-1.5 outline-none ${
                             mode === 'register' 
-                                ? 'bg-white shadow-sm border border-[#e8ddd5] text-[#657b35]' 
+                                ? 'bg-white shadow-sm border border-[#e8ddd5] text-[#68361c]' 
                                 : 'border-transparent text-gray-400 hover:text-gray-600 bg-transparent'
                         }`}
                         style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
@@ -131,7 +136,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                             <line x1="20" y1="8" x2="20" y2="14" />
                             <line x1="23" y1="11" x2="17" y2="11" />
                         </svg>
-                        REGISTER
+                        ĐĂNG KÝ
                     </button>
                 </div>
 
@@ -146,7 +151,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                         <>
                             {/* Username or Email */}
                             <div className="flex flex-col gap-1">
-                                <label htmlFor="username" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Username or Email</label>
+                                <label htmlFor="username" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Tên đăng nhập hoặc Email</label>
                                 <div className="relative flex items-center">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 flex items-center justify-center">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -158,7 +163,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                         type="text"
                                         id="username"
                                         placeholder="nguyenquocan1010@gmail.com"
-                                        className="w-full h-11 pl-11 pr-4 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#657b35] focus:ring-2 focus:ring-[#657b35]/10"
+                                        className="w-full h-11 pl-11 pr-4 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#68361c] focus:ring-2 focus:ring-[#68361c]/10"
                                         value={usernameOrEmail}
                                         onChange={(e) => setUsernameOrEmail(e.target.value)}
                                         required
@@ -168,7 +173,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                             
                             {/* Password */}
                             <div className="flex flex-col gap-1">
-                                <label htmlFor="password" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Password</label>
+                                <label htmlFor="password" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Mật khẩu</label>
                                 <div className="relative flex items-center">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 flex items-center justify-center">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -180,7 +185,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                         type={showPassword ? 'text' : 'password'}
                                         id="password"
                                         placeholder="••••••••••••"
-                                        className="w-full h-11 pl-11 pr-11 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#657b35] focus:ring-2 focus:ring-[#657b35]/10"
+                                        className="w-full h-11 pl-11 pr-11 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#68361c] focus:ring-2 focus:ring-[#68361c]/10"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
@@ -211,16 +216,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                 <label className="flex items-center gap-1.5 cursor-pointer text-gray-500 hover:text-gray-700 select-none font-semibold">
                                     <input 
                                         type="checkbox" 
-                                        className="w-3.5 h-3.5 rounded border-gray-300 text-[#657b35] focus:ring-[#657b35] accent-[#657b35]" 
+                                        className="w-3.5 h-3.5 rounded border-gray-300 text-[#68361c] focus:ring-[#68361c] accent-[#68361c]" 
                                     />
-                                    Remember me
+                                    Ghi nhớ đăng nhập
                                 </label>
                                 <a 
                                     href="#forgot" 
-                                    className="text-[#657b35] font-bold hover:text-[#55692d] transition-colors"
+                                    className="text-[#68361c] font-bold hover:text-[#4b2311] transition-colors"
                                     onClick={(e) => { e.preventDefault(); showToast('Tính năng quên mật khẩu đang được phát triển.', 'info'); }}
                                 >
-                                    Forgot password?
+                                    Quên mật khẩu?
                                 </a>
                             </div>
                         </>
@@ -228,7 +233,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                         <>
                             {/* Registration fields */}
                             <div className="flex flex-col gap-1">
-                                <label htmlFor="regUsername" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Username</label>
+                                <label htmlFor="regUsername" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Tên đăng nhập</label>
                                 <div className="relative flex items-center">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 flex items-center justify-center">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -240,7 +245,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                         type="text"
                                         id="regUsername"
                                         placeholder="annguyen10"
-                                        className="w-full h-11 pl-11 pr-4 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#657b35] focus:ring-2 focus:ring-[#657b35]/10"
+                                        className="w-full h-11 pl-11 pr-4 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#68361c] focus:ring-2 focus:ring-[#68361c]/10"
                                         value={regUsername}
                                         onChange={(e) => setRegUsername(e.target.value)}
                                         required
@@ -249,7 +254,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                             </div>
 
                             <div className="flex flex-col gap-1">
-                                <label htmlFor="regEmail" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Email Address</label>
+                                <label htmlFor="regEmail" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Địa chỉ Email</label>
                                 <div className="relative flex items-center">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 flex items-center justify-center">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -261,7 +266,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                         type="email"
                                         id="regEmail"
                                         placeholder="example@mail.com"
-                                        className="w-full h-11 pl-11 pr-4 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#657b35] focus:ring-2 focus:ring-[#657b35]/10"
+                                        className="w-full h-11 pl-11 pr-4 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#68361c] focus:ring-2 focus:ring-[#68361c]/10"
                                         value={regEmail}
                                         onChange={(e) => setRegEmail(e.target.value)}
                                         required
@@ -270,7 +275,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                             </div>
 
                             <div className="flex flex-col gap-1">
-                                <label htmlFor="fullName" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Full Name</label>
+                                <label htmlFor="fullName" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Họ và tên</label>
                                 <div className="relative flex items-center">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 flex items-center justify-center">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -285,7 +290,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                         type="text"
                                         id="fullName"
                                         placeholder="Nguyen Quoc An"
-                                        className="w-full h-11 pl-11 pr-4 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#657b35] focus:ring-2 focus:ring-[#657b35]/10"
+                                        className="w-full h-11 pl-11 pr-4 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#68361c] focus:ring-2 focus:ring-[#68361c]/10"
                                         value={fullName}
                                         onChange={(e) => setFullName(e.target.value)}
                                     />
@@ -293,7 +298,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                             </div>
 
                             <div className="flex flex-col gap-1">
-                                <label htmlFor="regPassword" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Password</label>
+                                <label htmlFor="regPassword" className="block font-bold mb-1 text-gray-400 text-[10px] tracking-wider uppercase">Mật khẩu</label>
                                 <div className="relative flex items-center">
                                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 flex items-center justify-center">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -305,7 +310,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                                         type={showPassword ? 'text' : 'password'}
                                         id="regPassword"
                                         placeholder="••••••••••••"
-                                        className="w-full h-11 pl-11 pr-11 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#657b35] focus:ring-2 focus:ring-[#657b35]/10"
+                                        className="w-full h-11 pl-11 pr-11 bg-[#fcfbf9] text-[#4b2311] border border-[#e8ddd5] rounded-xl text-xs transition-all outline-none focus:border-[#68361c] focus:ring-2 focus:ring-[#68361c]/10"
                                         value={regPassword}
                                         onChange={(e) => setRegPassword(e.target.value)}
                                         required
@@ -336,13 +341,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     {/* Action Button */}
                     <button 
                         type="submit" 
-                        className="w-full h-11 bg-[#657b35] hover:bg-[#55692d] text-white rounded-xl font-bold text-[11px] uppercase tracking-widest cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm border-none mt-4 outline-none" 
+                        className="w-full h-11 bg-[#68361c] hover:bg-[#4b2311] text-white rounded-xl font-bold text-[11px] uppercase tracking-widest cursor-pointer transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-sm border-none mt-4 outline-none" 
                         disabled={isLoading}
                         style={{ outline: 'none', border: 'none', boxShadow: 'none' }}
                     >
-                        {isLoading ? 'Processing...' : (
+                        {isLoading ? 'Đang xử lý...' : (
                             <>
-                                {mode === 'login' ? 'SIGN IN' : 'REGISTER'}
+                                {mode === 'login' ? 'ĐĂNG NHẬP' : 'ĐĂNG KÝ'}
                                 <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                                     <line x1="5" y1="12" x2="19" y2="12" />
                                     <polyline points="12 5 19 12 12 19" />
@@ -356,22 +361,22 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                 <div className="text-center text-xs text-gray-500 mt-6 font-medium">
                     {mode === 'login' ? (
                         <>
-                            Don't have an account? 
+                            Chưa có tài khoản? 
                             <span 
                                 onClick={() => toggleMode('register')} 
-                                className="text-[#657b35] font-bold hover:text-[#55692d] cursor-pointer ml-1.5 transition-colors"
+                                className="text-[#68361c] font-bold hover:text-[#4b2311] cursor-pointer ml-1.5 transition-colors"
                             >
-                                Register
+                                Đăng ký ngay
                             </span>
                         </>
                     ) : (
                         <>
-                            Already have an account? 
+                            Đã có tài khoản? 
                             <span 
                                 onClick={() => toggleMode('login')} 
-                                className="text-[#657b35] font-bold hover:text-[#55692d] cursor-pointer ml-1.5 transition-colors"
+                                className="text-[#68361c] font-bold hover:text-[#4b2311] cursor-pointer ml-1.5 transition-colors"
                             >
-                                Sign In
+                                Đăng nhập
                             </span>
                         </>
                     )}
