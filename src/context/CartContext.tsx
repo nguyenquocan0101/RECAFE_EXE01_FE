@@ -45,11 +45,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const mappedItems = res.data.cartItems.map((item: any) => ({
                     id: item.id,
                     productId: item.productId || item.product?.id,
-                    name: item.product?.name || 'Product',
+                    name: item.productName || item.product?.name || 'Product',
                     slug: item.product?.slug || '',
-                    price: item.product?.price || 0,
+                    price: item.unitPrice || item.product?.price || 0,
                     salePrice: item.product?.salePrice || null,
-                    image: item.product?.images?.[0]?.imageUrl || '/assets/re_cup.png',
+                    image: item.productThumbnail || item.product?.images?.[0]?.imageUrl || '/assets/re_cup.png',
                     quantity: item.quantity,
                     material: 'Standard',
                     size: 'Standard'
