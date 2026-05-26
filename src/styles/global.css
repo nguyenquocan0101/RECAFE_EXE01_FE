@@ -407,6 +407,8 @@ input, button, select, textarea {
   font-size: 2.5rem;
   font-weight: 700;
   color: var(--text-dark);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
   margin-bottom: 1.5rem;
 }
 
@@ -511,6 +513,7 @@ input, button, select, textarea {
 .featured-header-left h2 {
   font-size: 2.5rem;
   font-weight: 700;
+  line-height: 1.2;
   color: var(--text-dark);
 }
 
@@ -704,6 +707,7 @@ input, button, select, textarea {
 .stats-section-home h2 {
   font-size: 2.5rem;
   font-weight: 700;
+  line-height: 1.2;
   margin-bottom: 1.5rem;
   letter-spacing: -0.5px;
 }

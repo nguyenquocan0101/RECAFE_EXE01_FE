@@ -92,20 +92,24 @@ const convertToFormData = (data: Record<string, any>): FormData => {
 };
 
 export const createProduct = (data: Record<string, any> | FormData) => {
-    const body = data instanceof FormData ? data : convertToFormData(data);
+    const isFormData = data instanceof FormData;
     return fetch(`${apiUrl}api/admin/products`, {
         method: 'POST',
-        headers: { ...authHeader() },
-        body
+        headers: isFormData 
+            ? { ...authHeader() } 
+            : { 'Content-Type': 'application/json', ...authHeader() },
+        body: isFormData ? data : JSON.stringify(data)
     }).then(handleResponse);
 };
 
 export const updateProduct = (id: string, data: Record<string, any> | FormData) => {
-    const body = data instanceof FormData ? data : convertToFormData(data);
+    const isFormData = data instanceof FormData;
     return fetch(`${apiUrl}api/admin/products/${id}`, {
         method: 'PUT',
-        headers: { ...authHeader() },
-        body
+        headers: isFormData 
+            ? { ...authHeader() } 
+            : { 'Content-Type': 'application/json', ...authHeader() },
+        body: isFormData ? data : JSON.stringify(data)
     }).then(handleResponse);
 };
 
@@ -113,6 +117,51 @@ export const deleteProduct = (id: string) =>
     fetch(`${apiUrl}api/admin/products/${id}`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json', ...authHeader() }
+    }).then(handleResponse);
+
+export const uploadProductImages = (id: string, files: File[], replaceImages: boolean = true) => {
+    const formData = new FormData();
+    formData.append('ReplaceImages', replaceImages ? 'true' : 'false');
+    files.forEach(file => {
+        formData.append('ImageUrls', file);
+    });
+    return fetch(`${apiUrl}api/admin/products/${id}/images`, {
+        method: 'POST',
+        headers: { ...authHeader() },
+        body: formData
+    }).then(handleResponse);
+};
+
+// ─── Users ─────────────────────────────────────────────────────────────────
+
+export const getAdminUsers = (params?: { role?: number; isActive?: boolean; keyword?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.role !== undefined) query.set('role', String(params.role));
+    if (params?.isActive !== undefined) query.set('isActive', String(params.isActive));
+    if (params?.keyword) query.set('keyword', params.keyword);
+    const qs = query.toString();
+    return fetch(`${apiUrl}api/admin/users${qs ? `?${qs}` : ''}`, {
+        headers: { 'Content-Type': 'application/json', ...authHeader() }
+    }).then(handleResponse);
+};
+
+export const getAdminUserById = (id: string) =>
+    fetch(`${apiUrl}api/admin/users/${id}`, {
+        headers: { 'Content-Type': 'application/json', ...authHeader() }
+    }).then(handleResponse);
+
+export const updateAdminUser = (id: string, data: { email: string; fullName: string; phone?: string; birthday?: string | null; role: number; isActive: boolean }) =>
+    fetch(`${apiUrl}api/admin/users/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify(data)
+    }).then(handleResponse);
+
+export const setUserActive = (id: string, isActive: boolean) =>
+    fetch(`${apiUrl}api/admin/users/${id}/active`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify({ isActive })
     }).then(handleResponse);
 
 // ─── Public (reused in admin context) ─────────────────────────────────────

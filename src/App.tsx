@@ -11,6 +11,7 @@ import AdminDashboard from '@/pages/admin/AdminDashboard'
 import AdminOrders from '@/pages/admin/AdminOrders'
 import AdminProducts from '@/pages/admin/AdminProducts'
 import AdminCategories from '@/pages/admin/AdminCategories'
+import AdminUsers from '@/pages/admin/AdminUsers'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import LoginModal from '@/components/auth/LoginModal'
 import { useAuth } from '@/context/AuthContext'
@@ -55,6 +56,11 @@ export default function App() {
                         <Route path="categories" element={
                             <ProtectedRoute allowedRoles={['Admin']}>
                                 <AdminCategories />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="users" element={
+                            <ProtectedRoute allowedRoles={['Admin']}>
+                                <AdminUsers />
                             </ProtectedRoute>
                         } />
                     </Route>

@@ -23,6 +23,7 @@ interface Product {
     rewardPoints?: number;
     image?: string;
     thumbnailUrl?: string;
+    images?: { imageUrl: string }[] | null;
 }
 
 const AdminProducts: React.FC = () => {
@@ -201,7 +202,7 @@ const AdminProducts: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#FAF9F6] p-8 animate-slide-up">
             {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+            <div className="sticky top-0 z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 -mx-8 -mt-8 px-8 pt-8 pb-5 mb-3 bg-[#FAF9F6] border-b border-[#e8ddd5]/50">
                 <div>
                     <h1 className="text-3xl font-extrabold text-[#4b2311] tracking-tight">Quản lý kho hàng</h1>
                     <p className="text-[#68361c]/70 text-sm mt-1">Quản lý bộ sưu tập cà phê bền vững và theo dõi mức tồn kho trên toàn bộ danh mục.</p>
@@ -335,14 +336,19 @@ const AdminProducts: React.FC = () => {
                                         <tr key={p.id} className="hover:bg-[#FAF9F6]/50 transition-colors group">
                                             {/* Product Info */}
                                             <td className="px-6 py-5">
-                                                <div className="flex items-center gap-4">
+                                                <a 
+                                                    href={`/products/${p.slug}`} 
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer" 
+                                                    className="flex items-center gap-4 cursor-pointer group/item"
+                                                >
                                                     <img 
                                                         src={p.thumbnailUrl || p.image || getProductImage(p.id)} 
                                                         alt={p.name} 
-                                                        className="w-12 h-12 object-cover rounded border border-[#e8ddd5]/30 shadow-sm shrink-0" 
+                                                        className="w-12 h-12 object-cover rounded border border-[#e8ddd5]/30 shadow-sm shrink-0 group-hover/item:ring-2 group-hover/item:ring-[#657b35] transition-all" 
                                                     />
                                                     <div className="min-w-0">
-                                                        <h4 className="font-semibold text-[#2d2825] text-sm leading-snug group-hover:text-[#657b35] transition-colors truncate" title={p.name}>
+                                                        <h4 className="font-semibold text-[#2d2825] text-sm leading-snug group-hover/item:text-[#657b35] transition-colors truncate" title={p.name}>
                                                             {p.name}
                                                         </h4>
                                                         <div className="flex items-center gap-1.5 mt-1.5">
@@ -354,7 +360,7 @@ const AdminProducts: React.FC = () => {
                                                             ) : null}
                                                         </div>
                                                     </div>
-                                                </div>
+                                                </a>
                                             </td>
 
                                             {/* SKU */}

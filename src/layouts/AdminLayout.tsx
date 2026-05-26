@@ -23,7 +23,7 @@ const AdminLayout: React.FC = () => {
         }`;
 
     return (
-        <div className="flex min-h-screen bg-[#f7f4f0] font-sans">
+        <div className="flex h-screen overflow-hidden bg-[#f7f4f0] font-sans">
             {/* Sidebar */}
             <aside
                 className={`flex flex-col bg-white shadow-sm transition-all duration-300 ${
@@ -88,6 +88,15 @@ const AdminLayout: React.FC = () => {
                                     <path d="M4 6h16M4 12h16M4 18h16" />
                                 </svg>
                                 {sidebarOpen && <span>Danh mục</span>}
+                            </NavLink>
+
+                            <NavLink to="/admin/users" className={navLink}>
+                                <svg width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="shrink-0">
+                                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                                    <circle cx="9" cy="7" r="4" />
+                                    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
+                                </svg>
+                                {sidebarOpen && <span>Người dùng</span>}
                             </NavLink>
                         </>
                     )}

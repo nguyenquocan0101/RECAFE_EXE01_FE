@@ -52,7 +52,7 @@ const AdminDashboard: React.FC = () => {
     return (
         <div className="min-h-screen bg-[#FAF9F6] p-8 animate-slide-up">
             {/* Header section */}
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+            <div className="sticky top-0 z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6 -mx-8 -mt-8 px-8 pt-8 pb-5 mb-3 bg-[#FAF9F6] border-b border-[#e8ddd5]/50">
                 <div>
                     <h1 className="text-3xl font-extrabold text-[#4b2311] tracking-tight">Tổng quan quản trị</h1>
                     <p className="text-[#68361c]/70 text-sm mt-1">Chào mừng trở lại! Xem hiệu suất hoạt động, đơn hàng gần đây và quản lý kho hàng của bạn.</p>
