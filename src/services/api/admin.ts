@@ -68,6 +68,11 @@ export const getAdminProducts = () =>
         headers: { 'Content-Type': 'application/json', ...authHeader() }
     }).then(handleResponse);
 
+export const getAdminProductById = (id: string) =>
+    fetch(`${apiUrl}api/admin/products/${id}`, {
+        headers: { 'Content-Type': 'application/json', ...authHeader() }
+    }).then(handleResponse);
+
 const convertToFormData = (data: Record<string, any>): FormData => {
     if (data instanceof FormData) return data;
     const formData = new FormData();
@@ -126,6 +131,16 @@ export const uploadProductImages = (id: string, files: File[], replaceImages: bo
         formData.append('ImageUrls', file);
     });
     return fetch(`${apiUrl}api/admin/products/${id}/images`, {
+        method: 'POST',
+        headers: { ...authHeader() },
+        body: formData
+    }).then(handleResponse);
+};
+
+export const uploadProduct3DModel = (id: string, file: File) => {
+    const formData = new FormData();
+    formData.append('File', file);
+    return fetch(`${apiUrl}api/admin/products/${id}/model-3d`, {
         method: 'POST',
         headers: { ...authHeader() },
         body: formData

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import * as adminApi from '@/services/api/admin';
 import { Button } from '@/components/common/Button';
 import { ProductModal } from './ProductModal';
+import { Upload3DModal } from './Upload3DModal';
 
 interface Category { id: string; name: string; }
 interface Product {
@@ -24,7 +25,10 @@ interface Product {
     image?: string;
     thumbnailUrl?: string;
     images?: { imageUrl: string }[] | null;
+    model3DUrl?: string | null;
 }
+
+const Model3DViewer = React.lazy(() => import('@/components/product/Model3DViewer'));
 
 const AdminProducts: React.FC = () => {
     const [products, setProducts] = useState<Product[]>([]);
@@ -34,6 +38,8 @@ const AdminProducts: React.FC = () => {
     const [editTarget, setEditTarget] = useState<Product | null>(null);
     const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
+    const [upload3DTarget, setUpload3DTarget] = useState<Product | null>(null);
+    const [view3DTarget, setView3DTarget] = useState<Product | null>(null);
 
     // Filter and menu states
     const [filterTab, setFilterTab] = useState<'all' | 'low' | 'archived'>('all');
@@ -50,14 +56,22 @@ const AdminProducts: React.FC = () => {
                 adminApi.getAdminProducts(),
                 adminApi.getAdminCategories(),
             ]);
-            setProducts(Array.isArray(prodData) ? prodData : prodData?.data || []);
+            const freshProducts: Product[] = Array.isArray(prodData) ? prodData : prodData?.data || [];
+            setProducts(freshProducts);
             setCategories(Array.isArray(catData) ? catData : catData?.data || []);
+            // Sync editTarget với data mới nhất (fix checkbox không update sau save)
+            setEditTarget(prev => {
+                if (!prev) return prev;
+                const updated = freshProducts.find(p => p.id === prev.id);
+                return updated ?? prev;
+            });
         } catch (err: any) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
     };
+
 
     useEffect(() => {
         load();
@@ -102,10 +116,21 @@ const AdminProducts: React.FC = () => {
         setModalOpen(true);
     };
 
-    const openEdit = (p: Product) => {
+    const openEdit = async (p: Product) => {
+        // Mở modal ngay với data có sẵn để UX không bị delay
         setEditTarget(p);
         setModalOpen(true);
+        // Fetch full data từ GET /api/admin/products/{id} (có isPersonalizable, model3DUrl...)
+        try {
+            const res = await adminApi.getAdminProductById(p.id);
+            const fresh: Product = res?.data ?? res;
+            setEditTarget(prev => prev?.id === p.id ? { ...prev, ...fresh } : prev);
+        } catch {
+            // Giữ nguyên data cũ nếu fetch thất bại
+        }
     };
+
+
 
     const handleDelete = async (id: string) => {
         try {
@@ -433,12 +458,63 @@ const AdminProducts: React.FC = () => {
                                                         </svg>
                                                     </button>
                                                     {activeMenuId === p.id && (
-                                                        <div className="absolute right-0 mt-1 w-24 bg-white border border-[#e8ddd5] rounded shadow-lg py-1.5 z-20 animate-slide-up">
+                                                        <div className="absolute right-0 mt-1 w-36 bg-white border border-[#e8ddd5] rounded shadow-lg py-1.5 z-20 animate-slide-up">
                                                             <button 
                                                                 onClick={() => { openEdit(p); setActiveMenuId(null); }} 
                                                                 className="w-full text-left px-4 py-1.5 text-xs font-bold text-[#68361c] hover:bg-[#FAF9F6] focus:outline-none outline-none border-none border-0 bg-transparent shadow-none"
                                                             >
                                                                 Sửa
+                                                            </button>
+                                                            <button 
+                                                                onClick={async () => {
+                                                                    setActiveMenuId(null);
+                                                                    try {
+                                                                        const res = await adminApi.getAdminProductById(p.id);
+                                                                        const fresh: Product = res?.data ?? res;
+                                                                        setProducts(prev => prev.map(item => item.id === p.id ? { ...item, ...fresh } : item));
+                                                                        if (!fresh.isPersonalizable) {
+                                                                            alert("Sản phẩm này chưa được bật quyền Cá nhân hóa. Vui lòng bấm 'Sửa' và tick chọn 'Cho phép cá nhân hóa' trước khi upload file 3D.");
+                                                                            return;
+                                                                        }
+                                                                        setUpload3DTarget(fresh);
+                                                                    } catch (err: any) {
+                                                                        setUpload3DTarget(p);
+                                                                    }
+                                                                }} 
+                                                                className="w-full text-left px-4 py-1.5 text-xs font-bold text-[#657b35] hover:bg-[#f5f8f0] focus:outline-none outline-none border-none border-0 bg-transparent shadow-none flex items-center gap-1.5"
+                                                            >
+                                                                <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25" />
+                                                                </svg>
+                                                                Upload 3D
+                                                            </button>
+                                                            <button 
+                                                                onClick={async () => {
+                                                                    setActiveMenuId(null);
+                                                                    try {
+                                                                        const res = await adminApi.getAdminProductById(p.id);
+                                                                        const fresh: Product = res?.data ?? res;
+                                                                        setProducts(prev => prev.map(item => item.id === p.id ? { ...item, ...fresh } : item));
+                                                                        if (!fresh.model3DUrl) {
+                                                                            alert("Sản phẩm này chưa có mô hình 3D. Vui lòng sử dụng tính năng 'Upload 3D' trước.");
+                                                                            return;
+                                                                        }
+                                                                        setView3DTarget(fresh);
+                                                                    } catch (err: any) {
+                                                                        if (p.model3DUrl) {
+                                                                            setView3DTarget(p);
+                                                                        } else {
+                                                                            alert("Sản phẩm này chưa có mô hình 3D. Vui lòng sử dụng tính năng 'Upload 3D' trước.");
+                                                                        }
+                                                                    }
+                                                                }} 
+                                                                className="w-full text-left px-4 py-1.5 text-xs font-bold text-blue-600 hover:bg-blue-50 focus:outline-none outline-none border-none border-0 bg-transparent shadow-none flex items-center gap-1.5"
+                                                            >
+                                                                <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                </svg>
+                                                                Xem 3D
                                                             </button>
                                                             <button 
                                                                 onClick={() => { setDeleteConfirm(p.id); setActiveMenuId(null); }} 
@@ -523,6 +599,81 @@ const AdminProducts: React.FC = () => {
                 categories={categories}
                 onSaveSuccess={load}
             />
+
+            {/* Upload 3D Modal */}
+            {upload3DTarget && (
+                <Upload3DModal
+                    productId={upload3DTarget.id}
+                    productName={upload3DTarget.name}
+                    onClose={() => setUpload3DTarget(null)}
+                    onSuccess={(url) => {
+                        setProducts(prev => prev.map(p =>
+                            p.id === upload3DTarget.id ? { ...p, model3DUrl: url } : p
+                        ));
+                        setUpload3DTarget(null);
+                    }}
+                />
+            )}
+
+            {/* View 3D Modal */}
+            {view3DTarget && view3DTarget.model3DUrl && (
+                <div 
+                    style={{
+                        position: 'fixed', inset: 0, zIndex: 60,
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', padding: '1rem',
+                    }}
+                    onClick={e => { if (e.target === e.currentTarget) setView3DTarget(null); }}
+                >
+                    <div style={{
+                        background: '#fff',
+                        borderRadius: '16px',
+                        border: '1px solid #e8ddd5',
+                        boxShadow: '0 24px 64px rgba(75,35,17,0.18)',
+                        width: '95%',
+                        maxWidth: '960px',
+                        padding: '24px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '16px',
+                        animation: 'slideUp 0.2s ease',
+                    }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div>
+                                <h3 style={{ fontSize: '1rem', fontWeight: 800, color: '#4b2311', margin: 0 }}>
+                                    Xem mô hình 3D
+                                </h3>
+                                <p style={{ fontSize: '0.75rem', color: '#68361c', opacity: 0.7, margin: 0 }}>
+                                    {view3DTarget.name}
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => setView3DTarget(null)}
+                                style={{
+                                    width: '28px', height: '28px', borderRadius: '8px',
+                                    border: '1px solid #e8ddd5', background: '#FAF9F6',
+                                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    color: '#68361c',
+                                }}
+                            >
+                                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <div style={{ width: '100%', height: '600px' }}>
+                            <React.Suspense fallback={
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', background: '#FAF9F6', borderRadius: '12px' }}>
+                                    <div className="w-8 h-8 border-4 border-[#657b35] border-t-transparent rounded-full animate-spin" />
+                                </div>
+                            }>
+                                <Model3DViewer url={view3DTarget.model3DUrl} height="100%" />
+                            </React.Suspense>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Delete confirm */}
             {deleteConfirm && (

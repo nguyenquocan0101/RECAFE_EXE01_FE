@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, lazy, Suspense } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import ProductInfoCard from '@/components/product/ProductInfoCard'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
+
+const Model3DViewer = lazy(() => import('@/components/product/Model3DViewer'))
 
 interface ProductImage {
     id: string;
@@ -34,6 +36,7 @@ interface DBProduct {
     usageNote?: string | null;
     isPersonalizable?: boolean;
     rewardPoints?: number;
+    model3DUrl?: string | null;
     category?: ProductCategory | null;
     images?: ProductImage[] | null;
 }
@@ -46,6 +49,7 @@ const ProductDetail: React.FC = () => {
     const navigate = useNavigate()
     const [selectedImageIdx, setSelectedImageIdx] = useState(0)
     const [quantity, setQuantity] = useState(1)
+    const [viewMode, setViewMode] = useState<'image' | '3d'>('image')
     const [dbProduct, setDbProduct] = useState<DBProduct | null>(null)
     const [loading, setLoading] = useState(true)
     const [relatedProducts, setRelatedProducts] = useState<any[]>([])
@@ -227,23 +231,88 @@ const ProductDetail: React.FC = () => {
 
             {/* Main Detail Layout */}
             <div className="detail-main-layout">
-                {/* Left side: Images gallery */}
+                {/* Left side: Images gallery / 3D Viewer */}
                 <div className="detail-images-gallery">
-                    <div className="detail-thumbnails-list">
-                        {images.map((img, idx) => (
+                    {/* Tab switcher — chỉ hiện khi có model3DUrl */}
+                    {dbProduct.model3DUrl && (
+                        <div style={{
+                            display: 'flex',
+                            gap: '6px',
+                            marginBottom: '10px',
+                        }}>
                             <button
-                                key={idx}
-                                className={`detail-thumbnail-item ${selectedImageIdx === idx ? 'active' : ''}`}
-                                onClick={() => setSelectedImageIdx(idx)}
-                                aria-label={`View product image ${idx + 1}`}
+                                onClick={() => setViewMode('image')}
+                                style={{
+                                    flex: 1,
+                                    padding: '6px 0',
+                                    borderRadius: '8px',
+                                    fontSize: '0.72rem',
+                                    fontWeight: 700,
+                                    letterSpacing: '0.4px',
+                                    cursor: 'pointer',
+                                    border: viewMode === 'image' ? '1.5px solid #657b35' : '1.5px solid #e8ddd5',
+                                    background: viewMode === 'image' ? '#657b35' : '#FAF9F6',
+                                    color: viewMode === 'image' ? '#fff' : '#68361c',
+                                    transition: 'all 0.15s',
+                                }}
+                                aria-label="Xem ảnh sản phẩm"
                             >
-                                <img src={img} alt={`Product thumbnail ${idx + 1}`} />
+                                📷&nbsp; Ảnh sản phẩm
                             </button>
-                        ))}
-                    </div>
-                    <div className="detail-main-image-view">
-                        <img src={images[selectedImageIdx]} alt={`${dbProduct.name} main view`} />
-                    </div>
+                            <button
+                                onClick={() => setViewMode('3d')}
+                                style={{
+                                    flex: 1,
+                                    padding: '6px 0',
+                                    borderRadius: '8px',
+                                    fontSize: '0.72rem',
+                                    fontWeight: 700,
+                                    letterSpacing: '0.4px',
+                                    cursor: 'pointer',
+                                    border: viewMode === '3d' ? '1.5px solid #657b35' : '1.5px solid #e8ddd5',
+                                    background: viewMode === '3d' ? '#657b35' : '#FAF9F6',
+                                    color: viewMode === '3d' ? '#fff' : '#68361c',
+                                    transition: 'all 0.15s',
+                                }}
+                                aria-label="Xem mô hình 3D"
+                            >
+                                🧊&nbsp; Xem 3D
+                            </button>
+                        </div>
+                    )}
+
+                    {viewMode === '3d' && dbProduct.model3DUrl ? (
+                        <Suspense fallback={
+                            <div style={{
+                                height: '420px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: '#FAF6F0', borderRadius: '12px',
+                                color: '#657b35', fontSize: '0.85rem', fontWeight: 600,
+                            }}>
+                                Đang tải viewer 3D...
+                            </div>
+                        }>
+                            <Model3DViewer url={dbProduct.model3DUrl} height="420px" />
+                        </Suspense>
+                    ) : (
+                        <>
+                            <div className="detail-thumbnails-list">
+                                {images.map((img, idx) => (
+                                    <button
+                                        key={idx}
+                                        className={`detail-thumbnail-item ${selectedImageIdx === idx ? 'active' : ''}`}
+                                        onClick={() => setSelectedImageIdx(idx)}
+                                        aria-label={`View product image ${idx + 1}`}
+                                    >
+                                        <img src={img} alt={`Product thumbnail ${idx + 1}`} />
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="detail-main-image-view">
+                                <img src={images[selectedImageIdx]} alt={`${dbProduct.name} main view`} />
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* Right side: Product info card */}
