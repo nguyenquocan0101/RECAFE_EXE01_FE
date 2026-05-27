@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://api.recafe.site/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
