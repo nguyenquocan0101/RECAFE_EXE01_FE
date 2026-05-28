@@ -106,7 +106,7 @@ const Checkout: React.FC = () => {
             } else {
                 showToast(language === 'vi' ? 'Đặt hàng thành công! Cảm ơn hành động xanh của bạn.' : 'Order placed successfully! Thank you for choosing green.', 'success');
                 await clearCart();
-                navigate('/');
+                navigate('/profile');
             }
         } catch (err: any) {
             console.warn("Backend order creation failed, falling back to Demo Mode:", err);
@@ -133,7 +133,7 @@ const Checkout: React.FC = () => {
             } else {
                 showToast(language === 'vi' ? 'Đặt hàng thành công (Demo)! Cảm ơn hành động xanh của bạn.' : 'Order placed successfully (Demo)! Thank you for choosing green.', 'success');
                 await clearCart();
-                navigate('/');
+                navigate('/profile');
             }
         } finally {
             setSubmitting(false);
@@ -164,7 +164,7 @@ const Checkout: React.FC = () => {
             
             setTimeout(() => {
                 setIsPaymentModalOpen(false);
-                navigate('/');
+                navigate('/profile');
             }, 2500);
         } catch (err: any) {
             console.warn("Backend webhook API returned error, proceeding with rich client-side simulation:", err);
@@ -180,7 +180,7 @@ const Checkout: React.FC = () => {
             
             setTimeout(() => {
                 setIsPaymentModalOpen(false);
-                navigate('/');
+                navigate('/profile');
             }, 2500);
         } finally {
             setSimulating(false);
@@ -366,7 +366,7 @@ const Checkout: React.FC = () => {
                         <div className="space-y-4">
                             <div className="flex justify-between items-baseline pb-1">
                                 <h2 className="text-xl font-bold text-[#4b2311] tracking-tight">
-                                    {language === 'vi' ? 'Lựa Chọn Của Bạn' : 'Your Selection'}
+                                    {language === 'vi' ? 'Đơn hàng của bạn' : 'Your Selection'}
                                 </h2>
                                 <span className="text-xs font-semibold text-[#68361c]/60">
                                     {cartCount} {language === 'vi' ? 'Sản phẩm' : 'Items'}

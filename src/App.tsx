@@ -16,14 +16,43 @@ import AdminUsers from '@/pages/admin/AdminUsers'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import LoginModal from '@/components/auth/LoginModal'
 import { useAuth } from '@/context/AuthContext'
+import { useCart } from '@/context/CartContext'
+import ReCafeLoader from '@/components/common/ReCafeLoader'
+import ScrollToTop from '@/components/common/ScrollToTop'
 
 export default function App() {
-    const { isLoginModalOpen, closeLoginModal, loginReason } = useAuth();
+    const { isLoginModalOpen, closeLoginModal, loginReason, isLoading: isAuthLoading, isAuthenticated } = useAuth();
+    const { isLoading: isCartLoading } = useCart();
+    const [isMinTimeElapsed, setIsMinTimeElapsed] = React.useState(false);
+    const [isLoading, setIsLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsMinTimeElapsed(true);
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, []);
+
+    React.useEffect(() => {
+        if (isMinTimeElapsed) {
+            if (!isAuthLoading) {
+                if (isAuthenticated) {
+                    if (!isCartLoading) {
+                        setIsLoading(false);
+                    }
+                } else {
+                    setIsLoading(false);
+                }
+            }
+        }
+    }, [isMinTimeElapsed, isAuthLoading, isAuthenticated, isCartLoading]);
 
     return (
         <>
+            {isLoading && <ReCafeLoader />}
             <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} reason={loginReason} />
             <BrowserRouter>
+                <ScrollToTop />
                 <Routes>
                     {/* Public routes */}
                     <Route element={<MainLayout />}>

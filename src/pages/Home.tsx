@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useAuth } from '@/context/AuthContext'
@@ -11,40 +11,101 @@ const Home: React.FC = () => {
     const { addToCart } = useCart()
     const { showToast } = useToast()
 
-    const featuredProducts = [
-        {
-            id: 1,
-            title: 'RE:CUP Original',
-            category: 'NEW COLLECTION',
-            price: '250.000₫',
-            description: language === 'vi'
-                ? 'Ly cà phê tái chế từ bã cà phê , giữ nhiệt tốt và mang hương thơm tự...'
-                : 'Recycled coffee cup from coffee grounds, retains heat and carries a natural aroma...',
-            image: '/assets/re_cup.png',
-            badge: 'NEW COLLECTION'
-        },
-        {
-            id: 2,
-            title: 'RE:TRAY Hexagon',
-            category: 'BESTSELLER',
-            price: '420.000₫',
-            description: language === 'vi'
-                ? 'Khay trang trí đa năng với kết cấu bền bỉ và vẻ đẹp thô mộc từ thiên nhiên.'
-                : 'Multi-functional decorative tray with durable structure and rustic natural beauty.',
-            image: '/assets/re_tray.png',
-            badge: 'BESTSELLER'
-        },
-        {
-            id: 3,
-            title: 'RE:GLOW Holder',
-            category: 'DECOR',
-            price: '180.000₫',
-            description: language === 'vi'
-                ? 'Chân nến thơm thủ công, tạo điểm nhấn ấm cúng cho không gian sống bền vững.'
-                : 'Handcrafted scented candle holder, creating a cozy accent for sustainable living.',
-            image: '/assets/re_glow.png'
-        }
-    ]
+    interface FeaturedProduct {
+        id: string | number
+        title: string
+        category: string
+        price: string
+        numericPrice: number
+        description: string
+        image: string
+        badge?: string
+        slug: string
+    }
+
+    const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>([])
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        setLoading(true);
+        fetch('/api/Products/featured')
+            .then(res => res.json())
+            .then(resData => {
+                const list = Array.isArray(resData) ? resData : (resData?.data || []);
+                const mapped = list.map((p: any) => {
+                    const priceFormatted = typeof p.price === 'number'
+                        ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price)
+                        : (p.price || '0₫');
+                    
+                    const badge = p.isPersonalizable 
+                        ? 'THIẾT KẾ RIÊNG' 
+                        : (p.rewardPoints ? 'MỚI VỀ' : undefined);
+
+                    return {
+                        id: p.id,
+                        title: p.name,
+                        category: (p.categoryName || p.category?.name || 'Decor').toUpperCase(),
+                        price: priceFormatted,
+                        numericPrice: typeof p.price === 'number' ? p.price : 0,
+                        description: language === 'vi'
+                            ? (p.shortDescription || p.description || 'Sản phẩm làm từ bã cà phê tái chế sinh học.')
+                            : (p.description || p.shortDescription || 'Bio-recycled coffee grounds product.'),
+                        image: p.thumbnailUrl || p.image || (p.images && p.images[0]?.imageUrl) || '/assets/re_cup.png',
+                        badge: badge,
+                        slug: p.slug || String(p.id)
+                    };
+                });
+                setFeaturedProducts(mapped);
+            })
+            .catch(err => {
+                console.error('Error loading featured products:', err);
+                // Fallback to local static data if API fails
+                setFeaturedProducts([
+                    {
+                        id: '1',
+                        title: 'RE:CUP Original',
+                        category: 'NEW COLLECTION',
+                        price: '250.000₫',
+                        numericPrice: 250000,
+                        description: language === 'vi'
+                            ? 'Ly cà phê tái chế từ bã cà phê , giữ nhiệt tốt và mang hương thơm tự...'
+                            : 'Recycled coffee cup from coffee grounds, retains heat and carries a natural aroma...',
+                        image: '/assets/re_cup.png',
+                        badge: 'NEW COLLECTION',
+                        slug: 're-cup-original'
+                    },
+                    {
+                        id: '2',
+                        title: 'RE:TRAY Hexagon',
+                        category: 'BESTSELLER',
+                        price: '420.000₫',
+                        numericPrice: 420000,
+                        description: language === 'vi'
+                            ? 'Khay trang trí đa năng với kết cấu bền bỉ và vẻ đẹp thô mộc từ thiên nhiên.'
+                            : 'Multi-functional decorative tray with durable structure and rustic natural beauty.',
+                        image: '/assets/re_tray.png',
+                        badge: 'BESTSELLER',
+                        slug: 're-tray-hexagon'
+                    },
+                    {
+                        id: '3',
+                        title: 'RE:GLOW Holder',
+                        category: 'DECOR',
+                        price: '180.000₫',
+                        numericPrice: 180000,
+                        description: language === 'vi'
+                            ? 'Chân nến thơm thủ công, tạo điểm nhấn ấm cúng cho không gian sống bền vững.'
+                            : 'Handcrafted scented candle holder, creating a cozy accent for sustainable living.',
+                        image: '/assets/re_glow.png',
+                        badge: 'DECOR',
+                        slug: 're-glow-holder'
+                    }
+                ]);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
+    }, [language]);
 
     return (
         <div className="page-home">
@@ -138,65 +199,95 @@ const Home: React.FC = () => {
                 </div>
 
                 <div className="featured-grid-home">
-                    {featuredProducts.map((p) => (
-                        <div key={p.id} className="brand-product-card">
-                            {p.badge && (
-                                <span className={`card-badge ${p.badge.toLowerCase().replace(' ', '-')}`}>
-                                    {p.badge}
-                                </span>
-                            )}
-                            <div className="card-img-wrapper">
-                                <img src={p.image} alt={p.title} />
-                            </div>
-                            <div className="card-content">
-                                <span className="card-category">{p.badge || 'LIFESTYLE'}</span>
-                                <h3 className="card-title">{p.title}</h3>
-                                <p className="card-description">{p.description}</p>
-                                <div className="card-footer">
-                                    <span className="card-price">{p.price}</span>
-                                    <button 
-                                        className="btn-add-to-cart" 
-                                        title={t('detail.addToCart')} 
-                                        onClick={async (e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            if (!isAuthenticated) {
-                                                sessionStorage.setItem('pending_cart_action', JSON.stringify({
-                                                    item: {
-                                                        id: p.id.toString(),
-                                                        productId: p.id.toString(),
-                                                        name: p.title,
-                                                        slug: p.title.toLowerCase().replace(/\s+/g, '-'),
-                                                        price: parseInt(p.price.replace(/[^\d]/g, '')),
-                                                        image: p.image
-                                                    },
-                                                    quantity: 1,
-                                                    page: 'home'
-                                                }));
-                                                openLoginModal('addToCart');
-                                                return;
-                                            }
-                                            await addToCart({
-                                                id: p.id.toString(),
-                                                productId: p.id.toString(),
-                                                name: p.title,
-                                                slug: p.title.toLowerCase().replace(/\s+/g, '-'),
-                                                price: parseInt(p.price.replace(/[^\d]/g, '')),
-                                                image: p.image
-                                            }, 1);
-                                            showToast(language === 'vi' ? `Đã thêm ${p.title} vào giỏ` : `Added ${p.title} to cart`, 'success');
-                                        }}
-                                    >
-                                        <svg viewBox="0 0 24 24">
-                                            <circle cx="9" cy="21" r="1"></circle>
-                                            <circle cx="20" cy="21" r="1"></circle>
-                                            <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
-                                        </svg>
-                                    </button>
-                                </div>
+                    {loading ? (
+                        <div style={{
+                            gridColumn: '1 / -1',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            minHeight: '200px',
+                            gap: '12px'
+                        }}>
+                            <div style={{
+                                width: '32px',
+                                height: '32px',
+                                border: '3px solid #f0e8e0',
+                                borderTop: '3px solid #657b35',
+                                borderRadius: '50%',
+                                animation: 'spin 1s linear infinite'
+                            }} />
+                            <style>{`
+                                @keyframes spin {
+                                    0% { transform: rotate(0deg); }
+                                    100% { transform: rotate(360deg); }
+                                }
+                            `}</style>
+                            <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', fontWeight: 600 }}>
+                                {language === 'vi' ? 'ĐANG TẢI SẢN PHẨM NỔI BẬT...' : 'LOADING FEATURED PRODUCTS...'}
                             </div>
                         </div>
-                    ))}
+                    ) : (
+                        featuredProducts.map((p) => (
+                            <Link key={p.id} to={`/products/${p.slug}`} className="brand-product-card">
+                                {p.badge && (
+                                    <span className={`card-badge ${p.badge.toLowerCase().replace(' ', '-')}`}>
+                                        {p.badge}
+                                    </span>
+                                )}
+                                <div className="card-img-wrapper">
+                                    <img src={p.image} alt={p.title} />
+                                </div>
+                                <div className="card-content">
+                                    <span className="card-category">{p.badge || 'LIFESTYLE'}</span>
+                                    <h3 className="card-title">{p.title}</h3>
+                                    <p className="card-description">{p.description}</p>
+                                    <div className="card-footer" onClick={(e) => e.stopPropagation()}>
+                                        <span className="card-price">{p.price}</span>
+                                        <button 
+                                            className="btn-add-to-cart" 
+                                            title={t('detail.addToCart')} 
+                                            onClick={async (e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                if (!isAuthenticated) {
+                                                    sessionStorage.setItem('pending_cart_action', JSON.stringify({
+                                                        item: {
+                                                            id: p.id.toString(),
+                                                            productId: p.id.toString(),
+                                                            name: p.title,
+                                                            slug: p.slug,
+                                                            price: p.numericPrice,
+                                                            image: p.image
+                                                        },
+                                                        quantity: 1,
+                                                        page: 'home'
+                                                    }));
+                                                    openLoginModal('addToCart');
+                                                    return;
+                                                }
+                                                await addToCart({
+                                                    id: p.id.toString(),
+                                                    productId: p.id.toString(),
+                                                    name: p.title,
+                                                    slug: p.slug,
+                                                    price: p.numericPrice,
+                                                    image: p.image
+                                                }, 1);
+                                                showToast(language === 'vi' ? `Đã thêm ${p.title} vào giỏ` : `Added ${p.title} to cart`, 'success');
+                                            }}
+                                        >
+                                            <svg viewBox="0 0 24 24">
+                                                <circle cx="9" cy="21" r="1"></circle>
+                                                <circle cx="20" cy="21" r="1"></circle>
+                                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </Link>
+                        ))
+                    )}
                 </div>
             </section>
 

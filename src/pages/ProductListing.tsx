@@ -161,8 +161,12 @@ const ProductListing: React.FC = () => {
                                 onChange={(e) => setPriceRange(Number(e.target.value))}
                             />
                             <div className="price-slider-display">
-                                <span>$0</span>
-                                <span>Up to ${priceRange}</span>
+                                <span>{language === 'vi' ? '0 đ' : '$0'}</span>
+                                <span>
+                                    {language === 'vi'
+                                        ? `Lên đến ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(priceRange * 1000)}`
+                                        : `Up to $${priceRange}`}
+                                </span>
                             </div>
                         </div>
                     </div>
