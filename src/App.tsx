@@ -5,6 +5,7 @@ import AdminLayout from '@/layouts/AdminLayout'
 import Home from '@/pages/Home'
 import ProductListing from '@/pages/ProductListing'
 import ProductDetail from '@/pages/ProductDetail'
+import ProductCustomizer from '@/pages/ProductCustomizer'
 import EnvironmentalImpact from '@/pages/EnvironmentalImpact'
 import Checkout from '@/pages/Checkout'
 import Profile from '@/pages/Profile'
@@ -59,6 +60,11 @@ export default function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/products" element={<ProductListing />} />
                         <Route path="/products/:slug" element={<ProductDetail />} />
+                        <Route path="/products/:slug/customize" element={
+                            <ProtectedRoute>
+                                <ProductCustomizer />
+                            </ProtectedRoute>
+                        } />
                         <Route path="/environmental-impact" element={<EnvironmentalImpact />} />
                         <Route path="/checkout" element={<Checkout />} />
                         <Route path="/profile" element={

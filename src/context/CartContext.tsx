@@ -22,7 +22,7 @@ interface CartContextType {
     cartCount: number;
     cartTotal: number;
     isLoading: boolean;
-    addToCart: (item: Omit<CartItem, 'quantity' | 'id'> & { id: string }, quantity: number) => Promise<void>;
+    addToCart: (item: Omit<CartItem, 'quantity' | 'id'> & { id: string }, quantity: number, personalizationNote?: string | null) => Promise<void>;
     removeFromCart: (id: string) => Promise<void>;
     updateQuantity: (id: string, quantity: number) => Promise<void>;
     clearCart: () => Promise<void>;
@@ -111,11 +111,11 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
     }, [token, language]);
 
-    const addToCart = async (newItem: Omit<CartItem, 'quantity' | 'id'> & { id: string }, quantity: number) => {
+    const addToCart = async (newItem: Omit<CartItem, 'quantity' | 'id'> & { id: string }, quantity: number, personalizationNote: string | null = null) => {
         try {
             setIsLoading(true);
             // newItem.id passed from ProductDetail is actually the productId
-            await addCartItem(newItem.id, quantity);
+            await addCartItem(newItem.id, quantity, null, personalizationNote);
             await fetchCart(); // Refresh cart from server
         } catch (error: any) {
             console.error("Failed to add to cart:", error);

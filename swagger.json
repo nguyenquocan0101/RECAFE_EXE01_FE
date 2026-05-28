@@ -1117,6 +1117,208 @@
         }
       }
     },
+    "/api/products/{productId}/customizations": {
+      "post": {
+        "tags": [
+          "ProductCustomizations"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "PortraitImage"
+                ],
+                "type": "object",
+                "properties": {
+                  "PortraitImage": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "PositionX": {
+                    "maximum": 10,
+                    "minimum": -10,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "PositionY": {
+                    "maximum": 10,
+                    "minimum": -10,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "PositionZ": {
+                    "maximum": 10,
+                    "minimum": -10,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "RotationX": {
+                    "maximum": 360,
+                    "minimum": -360,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "RotationY": {
+                    "maximum": 360,
+                    "minimum": -360,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "RotationZ": {
+                    "maximum": 360,
+                    "minimum": -360,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "Scale": {
+                    "maximum": 10,
+                    "minimum": 0.1,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "EngraveDepth": {
+                    "maximum": 5,
+                    "minimum": 0.1,
+                    "type": "number",
+                    "format": "double"
+                  },
+                  "Note": {
+                    "maxLength": 1000,
+                    "minLength": 0,
+                    "type": "string"
+                  }
+                }
+              },
+              "encoding": {
+                "PortraitImage": {
+                  "style": "form"
+                },
+                "PositionX": {
+                  "style": "form"
+                },
+                "PositionY": {
+                  "style": "form"
+                },
+                "PositionZ": {
+                  "style": "form"
+                },
+                "RotationX": {
+                  "style": "form"
+                },
+                "RotationY": {
+                  "style": "form"
+                },
+                "RotationZ": {
+                  "style": "form"
+                },
+                "Scale": {
+                  "style": "form"
+                },
+                "EngraveDepth": {
+                  "style": "form"
+                },
+                "Note": {
+                  "style": "form"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "ProductCustomizations"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/products/{productId}/customizations/bootstrap": {
+      "get": {
+        "tags": [
+          "ProductCustomizations"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/products/{productId}/customizations/{customizationId}": {
+      "get": {
+        "tags": [
+          "ProductCustomizations"
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "customizationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/Products": {
       "get": {
         "tags": [
@@ -1944,6 +2146,9 @@
     },
     {
       "name": "Orders"
+    },
+    {
+      "name": "ProductCustomizations"
     },
     {
       "name": "Products"

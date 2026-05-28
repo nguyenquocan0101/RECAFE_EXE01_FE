@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useAuth } from '@/context/AuthContext'
 
@@ -52,6 +53,7 @@ const ProductInfoCard: React.FC<ProductInfoCardProps> = ({
 }) => {
     const { t, language } = useLanguage()
     const { isAuthenticated, openLoginModal } = useAuth()
+    const navigate = useNavigate()
     const addBtnRef = useRef<HTMLButtonElement>(null)
     const [addedToCart, setAddedToCart] = useState(false)
 
@@ -265,6 +267,27 @@ const ProductInfoCard: React.FC<ProductInfoCardProps> = ({
                         </button>
                     </div>
                 </div>
+
+                {/* 3D Customizer Action Button — Only if personalizable */}
+                {dbProduct.isPersonalizable && (
+                    <button 
+                        onClick={() => {
+                            if (!isAuthenticated) {
+                                openLoginModal('customization');
+                                return;
+                            }
+                            navigate(`/products/${dbProduct.slug}/customize`);
+                        }}
+                        className="w-full bg-[#FAF6F0] hover:bg-[#F0EBE3] text-primary border border-primary/20 font-bold py-4 rounded-xl transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 shadow-md outline-none cursor-pointer mb-2"
+                    >
+                        <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 0" }}>
+                            edit
+                        </span>
+                        <span className="uppercase tracking-widest text-xs">
+                            {language === 'vi' ? 'Khắc chân dung 3D / Tự thiết kế' : '3D Engrave / Design in 3D'}
+                        </span>
+                    </button>
+                )}
 
                 {/* Add to Cart Button */}
                 <button 
