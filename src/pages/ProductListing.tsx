@@ -231,8 +231,19 @@ const ProductListing: React.FC = () => {
                                                         title={t('detail.addToCart')} 
                                                         onClick={async (e) => {
                                                             e.preventDefault();
-                                                            e.stopPropagation();
                                                             if (!isAuthenticated) {
+                                                                sessionStorage.setItem('pending_cart_action', JSON.stringify({
+                                                                    item: {
+                                                                        id: product.id as string,
+                                                                        productId: product.id as string,
+                                                                        name: product.title,
+                                                                        slug: product.slug,
+                                                                        price: product.price,
+                                                                        image: product.image
+                                                                    },
+                                                                    quantity: 1,
+                                                                    page: 'listing'
+                                                                }));
                                                                 openLoginModal('addToCart');
                                                                 return;
                                                             }

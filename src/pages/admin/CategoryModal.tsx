@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as adminApi from '@/services/api/admin';
 import { Button } from '@/components/common/Button';
+import { Modal } from '@/components/common/Modal';
 
 interface Category {
     id: string;
@@ -68,10 +69,8 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
         }
     };
 
-    if (!isOpen) return null;
-
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+        <Modal isOpen={isOpen} onClose={onClose} zIndex={50}>
             <div className="bg-white rounded w-full max-w-md mx-4 shadow-2xl border border-[#e8ddd5]/50 animate-slide-up">
                 <div className="flex items-center justify-between px-6 py-5 border-b border-[#f0e8e0] sticky top-0 bg-white z-10">
                     <h2 className="text-lg font-extrabold text-[#4b2311]">
@@ -145,6 +144,6 @@ export const CategoryModal: React.FC<CategoryModalProps> = ({
                     </Button>
                 </div>
             </div>
-        </div>
+        </Modal>
     );
 };

@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react'
 import { getCart, addCartItem, updateCartItem, removeCartItem, clearCart as clearCartApi } from '../services/api/cart'
 import { useToast } from './ToastContext'
 import { useAuth } from './AuthContext'
+import { useLanguage } from './LanguageContext'
 
 export interface CartItem {
     id: string; // backend cart item ID
@@ -35,6 +36,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isLoading, setIsLoading] = useState(false);
     const { showToast } = useToast();
     const { token } = useAuth();
+    const { language } = useLanguage();
 
     const fetchCart = async () => {
         if (!token) return;
@@ -70,10 +72,44 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         if (token) {
             fetchCart();
+            // Handle pending guest cart action
+            const pendingActionStr = sessionStorage.getItem('pending_cart_action');
+            if (pendingActionStr) {
+                try {
+                    const action = JSON.parse(pendingActionStr);
+                    sessionStorage.removeItem('pending_cart_action');
+                    
+                    // Delay slightly to let fetchCart run or just perform addition
+                    setTimeout(async () => {
+                        try {
+                            await addCartItem(action.item.id, action.quantity);
+                            await fetchCart(); // Refresh cart from server
+                            
+                            showToast(
+                                language === 'vi' 
+                                    ? `Đã thêm ${action.item.name} vào giỏ` 
+                                    : `Added ${action.item.name} to cart`, 
+                                'success'
+                            );
+                            
+                            if (action.buyNow) {
+                                window.dispatchEvent(new CustomEvent('app-redirect', { detail: '/checkout' }));
+                            } else if (action.page === 'detail') {
+                                window.dispatchEvent(new CustomEvent('trigger-fly-to-cart'));
+                            }
+                        } catch (err: any) {
+                            console.error("Failed to execute pending cart action:", err);
+                            showToast(err.message || 'Failed to add item to cart', 'error');
+                        }
+                    }, 500);
+                } catch (e) {
+                    console.error("Error parsing pending cart action", e);
+                }
+            }
         } else {
             setCartItems([]);
         }
-    }, [token]);
+    }, [token, language]);
 
     const addToCart = async (newItem: Omit<CartItem, 'quantity' | 'id'> & { id: string }, quantity: number) => {
         try {

@@ -87,3 +87,12 @@ export const simulateSepayWebhook = async (data: SepayWebhookPayload) => {
     });
     return handleResponse(response);
 };
+
+export const getMyOrders = async () => {
+    const response = await fetch(`${apiUrl}api/orders/my-orders`, {
+        method: 'GET',
+        headers: getHeaders()
+    });
+    return handleResponse(response);
+};
+

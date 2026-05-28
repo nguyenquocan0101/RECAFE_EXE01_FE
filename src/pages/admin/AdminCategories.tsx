@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as adminApi from '@/services/api/admin';
 import { Button } from '@/components/common/Button';
+import { Modal } from '@/components/common/Modal';
 import { CategoryModal } from './CategoryModal';
 
 interface Category {
@@ -396,16 +397,18 @@ const AdminCategories: React.FC = () => {
             )}
 
             {/* Category Modal Component */}
-            <CategoryModal 
-                isOpen={modalOpen}
-                onClose={() => setModalOpen(false)}
-                editTarget={editTarget}
-                onSaveSuccess={load}
-            />
+            {modalOpen && (
+                <CategoryModal 
+                    isOpen={modalOpen}
+                    onClose={() => setModalOpen(false)}
+                    editTarget={editTarget}
+                    onSaveSuccess={load}
+                />
+            )}
 
             {/* Delete confirm */}
-            {deleteConfirm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+            <Modal isOpen={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} zIndex={50}>
+                {deleteConfirm && (
                     <div className="bg-white rounded w-full max-w-sm shadow-2xl p-6 border border-[#e8ddd5]/50 animate-slide-up">
                         <div className="w-12 h-12 rounded bg-red-50 flex items-center justify-center text-red-600 mb-4">
                             <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -419,8 +422,8 @@ const AdminCategories: React.FC = () => {
                             <Button variant="danger" onClick={() => handleDelete(deleteConfirm)} className="px-4 py-2 text-xs">Xoá vĩnh viễn</Button>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </Modal>
         </div>
     );
 };

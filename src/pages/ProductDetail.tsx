@@ -45,7 +45,7 @@ const ProductDetail: React.FC = () => {
     const { t, language } = useLanguage()
     const { slug } = useParams<{ slug: string }>()
     const { addToCart } = useCart()
-    const { isAuthenticated, openLoginModal } = useAuth()
+    const { isAuthenticated, openLoginModal, isAdmin } = useAuth()
     const navigate = useNavigate()
     const [selectedImageIdx, setSelectedImageIdx] = useState(0)
     const [quantity, setQuantity] = useState(1)
@@ -107,11 +107,28 @@ const ProductDetail: React.FC = () => {
     }, [slug, language]);
 
     const handleAddToCart = async () => {
+        if (!dbProduct) return;
         if (!isAuthenticated) {
+            sessionStorage.setItem('pending_cart_action', JSON.stringify({
+                item: {
+                    id: dbProduct.id,
+                    productId: dbProduct.id,
+                    name: dbProduct.name,
+                    slug: dbProduct.slug,
+                    price: dbProduct.price,
+                    salePrice: dbProduct.salePrice,
+                    image: dbProduct.images && dbProduct.images.length > 0 
+                        ? dbProduct.images[0].imageUrl 
+                        : '/assets/re_cup.png',
+                    material: dbProduct.material || (language === 'vi' ? 'Bã cà phê tái chế sinh học' : 'Bio-recycled coffee grounds'),
+                    size: dbProduct.size || 'Standard'
+                },
+                quantity: quantity,
+                page: 'detail'
+            }));
             openLoginModal('addToCart');
             return;
         }
-        if (!dbProduct) return;
         
         await addToCart({
             id: dbProduct.id,
@@ -129,11 +146,29 @@ const ProductDetail: React.FC = () => {
     }
 
     const handleBuyNow = async () => {
+        if (!dbProduct) return;
         if (!isAuthenticated) {
+            sessionStorage.setItem('pending_cart_action', JSON.stringify({
+                item: {
+                    id: dbProduct.id,
+                    productId: dbProduct.id,
+                    name: dbProduct.name,
+                    slug: dbProduct.slug,
+                    price: dbProduct.price,
+                    salePrice: dbProduct.salePrice,
+                    image: dbProduct.images && dbProduct.images.length > 0 
+                        ? dbProduct.images[0].imageUrl 
+                        : '/assets/re_cup.png',
+                    material: dbProduct.material || (language === 'vi' ? 'Bã cà phê tái chế sinh học' : 'Bio-recycled coffee grounds'),
+                    size: dbProduct.size || 'Standard'
+                },
+                quantity: quantity,
+                page: 'detail',
+                buyNow: true
+            }));
             openLoginModal('addToCart');
             return;
         }
-        if (!dbProduct) return;
 
         await addToCart({
             id: dbProduct.id,
@@ -233,8 +268,8 @@ const ProductDetail: React.FC = () => {
             <div className="detail-main-layout">
                 {/* Left side: Images gallery / 3D Viewer */}
                 <div className="detail-images-gallery">
-                    {/* Tab switcher — chỉ hiện khi có model3DUrl */}
-                    {dbProduct.model3DUrl && (
+                    {/* Tab switcher — chỉ hiện khi có model3DUrl & là admin */}
+                    {dbProduct.model3DUrl && isAdmin && (
                         <div style={{
                             display: 'flex',
                             gap: '6px',
@@ -281,7 +316,7 @@ const ProductDetail: React.FC = () => {
                         </div>
                     )}
 
-                    {viewMode === '3d' && dbProduct.model3DUrl ? (
+                    {viewMode === '3d' && dbProduct.model3DUrl && isAdmin ? (
                         <Suspense fallback={
                             <div style={{
                                 height: '420px',

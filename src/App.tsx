@@ -7,6 +7,7 @@ import ProductListing from '@/pages/ProductListing'
 import ProductDetail from '@/pages/ProductDetail'
 import EnvironmentalImpact from '@/pages/EnvironmentalImpact'
 import Checkout from '@/pages/Checkout'
+import Profile from '@/pages/Profile'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
 import AdminOrders from '@/pages/admin/AdminOrders'
 import AdminProducts from '@/pages/admin/AdminProducts'
@@ -31,6 +32,11 @@ export default function App() {
                         <Route path="/products/:slug" element={<ProductDetail />} />
                         <Route path="/environmental-impact" element={<EnvironmentalImpact />} />
                         <Route path="/checkout" element={<Checkout />} />
+                        <Route path="/profile" element={
+                            <ProtectedRoute>
+                                <Profile />
+                            </ProtectedRoute>
+                        } />
                     </Route>
 
                     {/* Admin / Staff routes */}

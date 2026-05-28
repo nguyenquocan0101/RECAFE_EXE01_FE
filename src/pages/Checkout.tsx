@@ -20,17 +20,17 @@ const Checkout: React.FC = () => {
     } = useCart()
 
     const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank' | 'cod'>('cod')
-    const [promoCode, setPromoCode] = useState('ECO10')
-    const [promoDiscount, setPromoDiscount] = useState(() => Math.floor(cartTotal * 0.1))
+    const [promoCode, setPromoCode] = useState('')
+    const [promoDiscount, setPromoDiscount] = useState(0)
     
     // Address fields
-    const [firstName, setFirstName] = useState('Jane')
-    const [lastName, setLastName] = useState('Doe')
-    const [streetAddress, setStreetAddress] = useState('123 Le Loi')
-    const [phone, setPhone] = useState('0901234567')
+    const [firstName, setFirstName] = useState('An')
+    const [lastName, setLastName] = useState('Nguyen Quoc')
+    const [streetAddress, setStreetAddress] = useState('Le Van Viet')
+    const [phone, setPhone] = useState('0359261605')
     const [province, setProvince] = useState('Ho Chi Minh')
-    const [district, setDistrict] = useState('Quan 1')
-    const [ward, setWard] = useState('Ben Nghe')
+    const [district, setDistrict] = useState('Quan 9')
+    const [ward, setWard] = useState('Tan Phu')
     const [submitting, setSubmitting] = useState(false)
 
     // Payment state variables
@@ -46,15 +46,25 @@ const Checkout: React.FC = () => {
     const handleApplyPromo = (e: React.FormEvent) => {
         e.preventDefault();
         const code = promoCode.trim().toUpperCase();
-        if (code === 'ECO10') {
-            setPromoDiscount(Math.floor(cartTotal * 0.1));
-            showToast(language === 'vi' ? 'Đã áp dụng mã giảm giá 10%!' : '10% discount applied!', 'success');
-        } else if (code === 'RECAFE20') {
-            setPromoDiscount(Math.floor(cartTotal * 0.2));
-            showToast(language === 'vi' ? 'Đã áp dụng mã giảm giá 20%!' : '20% discount applied!', 'success');
-        } else {
-            showToast(language === 'vi' ? 'Mã giảm giá không hợp lệ' : 'Invalid promo code', 'error');
+        
+        // Dynamically match any uppercase code ending in 1 or 2 digits (e.g., ECO10, RECAFE20, SALE15)
+        const match = code.match(/^[A-Z0-9]+?([0-9]{1,2})$/);
+        
+        if (match) {
+            const percent = parseInt(match[1], 10);
+            if (percent > 0 && percent <= 50) { // Limit discount percentage to max 50%
+                setPromoDiscount(Math.floor(cartTotal * (percent / 100)));
+                showToast(
+                    language === 'vi' 
+                        ? `Đã áp dụng mã giảm giá ${percent}%!` 
+                        : `${percent}% discount applied!`, 
+                    'success'
+                );
+                return;
+            }
         }
+        
+        showToast(language === 'vi' ? 'Mã giảm giá không hợp lệ' : 'Invalid promo code', 'error');
     };
 
     const handleConfirmOrder = async () => {

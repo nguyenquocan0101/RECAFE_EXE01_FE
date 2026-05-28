@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 type ToastType = 'success' | 'error' | 'info';
 
@@ -26,6 +26,40 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             setToasts((prev) => prev.filter((t) => t.id !== id));
         }, 3000);
     }, []);
+
+    useEffect(() => {
+        const originalAlert = window.alert;
+        window.alert = (message: any) => {
+            const msgStr = String(message);
+            const lowerMsg = msgStr.toLowerCase();
+            
+            let type: ToastType = 'info';
+            if (
+                lowerMsg.includes('lỗi') || 
+                lowerMsg.includes('thất bại') || 
+                lowerMsg.includes('error') || 
+                lowerMsg.includes('failed') || 
+                lowerMsg.includes('không được') || 
+                lowerMsg.includes('chưa được') || 
+                lowerMsg.includes('vui lòng')
+            ) {
+                type = 'error';
+            } else if (
+                lowerMsg.includes('thành công') || 
+                lowerMsg.includes('success') || 
+                lowerMsg.includes('đăng ký') || 
+                lowerMsg.includes('đăng nhập')
+            ) {
+                type = 'success';
+            }
+            
+            showToast(msgStr, type);
+        };
+        
+        return () => {
+            window.alert = originalAlert;
+        };
+    }, [showToast]);
 
     const removeToast = useCallback((id: string) => {
         setToasts((prev) => prev.filter((t) => t.id !== id));

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react'
 import * as adminApi from '@/services/api/admin'
+import { Modal } from '@/components/common/Modal'
 
 interface Upload3DModalProps {
     productId: string
@@ -9,7 +10,7 @@ interface Upload3DModalProps {
 }
 
 const MAX_SIZE_BYTES = 25 * 1024 * 1024 // 25MB
-const ACCEPTED_EXTS = ['.glb', '.gltf']
+const ACCEPTED_EXTS = ['.glb', '.gltf', '.stl', '.obj', '.3mf']
 
 export const Upload3DModal: React.FC<Upload3DModalProps> = ({
     productId,
@@ -25,7 +26,7 @@ export const Upload3DModal: React.FC<Upload3DModalProps> = ({
 
     const validateFile = (f: File): string | null => {
         const ext = '.' + f.name.split('.').pop()?.toLowerCase()
-        if (!ACCEPTED_EXTS.includes(ext)) return `Chỉ chấp nhận file .glb hoặc .gltf`
+        if (!ACCEPTED_EXTS.includes(ext)) return `Chỉ chấp nhận file .glb, .gltf, .stl, .obj hoặc .3mf`
         if (f.size > MAX_SIZE_BYTES) return `File quá lớn (tối đa 25MB, file của bạn: ${(f.size / 1024 / 1024).toFixed(1)}MB)`
         return null
     }
@@ -63,13 +64,12 @@ export const Upload3DModal: React.FC<Upload3DModalProps> = ({
     const formatSize = (bytes: number) => `${(bytes / 1024 / 1024).toFixed(2)} MB`
 
     return (
-        <div
-            style={{
-                position: 'fixed', inset: 0, zIndex: 60,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)', padding: '1rem',
-            }}
-            onClick={e => { if (e.target === e.currentTarget) onClose() }}
+        <Modal 
+            isOpen={true} 
+            onClose={onClose} 
+            zIndex={60}
+            closeOnOverlayClick={true}
+            style={{ padding: '1rem' }}
         >
             <div style={{
                 background: '#fff',
@@ -143,7 +143,7 @@ export const Upload3DModal: React.FC<Upload3DModalProps> = ({
                     <input
                         ref={inputRef}
                         type="file"
-                        accept=".glb,.gltf"
+                        accept=".glb,.gltf,.stl,.obj,.3mf"
                         style={{ display: 'none' }}
                         onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
                     />
@@ -176,7 +176,7 @@ export const Upload3DModal: React.FC<Upload3DModalProps> = ({
                                 Kéo thả hoặc click để chọn
                             </span>
                             <span style={{ fontSize: '0.72rem', color: '#888079' }}>
-                                Chỉ nhận <strong>.glb</strong> hoặc <strong>.gltf</strong> · Tối đa 25MB
+                                Chỉ nhận <strong>.glb</strong>, <strong>.gltf</strong>, <strong>.stl</strong>, <strong>.obj</strong> hoặc <strong>.3mf</strong> · Tối đa 25MB
                             </span>
                         </div>
                     )}
@@ -237,7 +237,7 @@ export const Upload3DModal: React.FC<Upload3DModalProps> = ({
                     </button>
                 </div>
             </div>
-        </div>
+        </Modal>
     )
 }
 

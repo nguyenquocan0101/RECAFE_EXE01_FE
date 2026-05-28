@@ -1,6 +1,7 @@
 import React from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useToast } from '@/context/ToastContext'
+import { Modal } from '@/components/common/Modal'
 
 interface SepayPaymentModalProps {
     isOpen: boolean;
@@ -35,7 +36,7 @@ const SepayPaymentModal: React.FC<SepayPaymentModalProps> = ({
     }
 
     return (
-        <div className="fixed inset-0 bg-[#4b2311]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
+        <Modal isOpen={isOpen} onClose={onClose} zIndex={50}>
             <div className="bg-white rounded-[32px] border border-[#eaddd2] max-w-2xl w-full overflow-hidden shadow-[0_20px_50px_rgba(75,35,17,0.12)] flex flex-col relative max-h-[90vh]">
                 {/* Header */}
                 <div className="flex items-center justify-between px-8 py-5 border-b border-[#eaddd2]/40 bg-stone-50/50 shrink-0">
@@ -196,7 +197,7 @@ const SepayPaymentModal: React.FC<SepayPaymentModalProps> = ({
                     )}
                 </div>
             </div>
-        </div>
+        </Modal>
     )
 }
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import * as adminApi from '@/services/api/admin';
+import { Modal } from '@/components/common/Modal';
 
 // UserRole: 0 = Customer, 1 = Staff, 2 = Admin
 const ROLE_LABELS: Record<number, string> = { 0: 'Khách hàng', 1: 'Nhân viên', 2: 'Admin' };
@@ -408,8 +409,8 @@ const AdminUsers: React.FC = () => {
             )}
 
             {/* Edit User Modal */}
-            {editingUser && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#4b2311]/50 backdrop-blur-sm p-4 overflow-y-auto">
+            <Modal isOpen={!!editingUser} onClose={() => setEditingUser(null)} zIndex={50}>
+                {editingUser && (
                     <div className="bg-white rounded-2xl border border-[#eaddd2] w-full max-w-md max-h-[90vh] shadow-[0_20px_50px_rgba(75,35,17,0.15)] flex flex-col overflow-hidden animate-scale-up my-auto">
 
                         {/* Modal Header */}
@@ -523,8 +524,8 @@ const AdminUsers: React.FC = () => {
                             </button>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </Modal>
         </div>
     );
 };

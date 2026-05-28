@@ -161,6 +161,18 @@ const Home: React.FC = () => {
                                             e.preventDefault();
                                             e.stopPropagation();
                                             if (!isAuthenticated) {
+                                                sessionStorage.setItem('pending_cart_action', JSON.stringify({
+                                                    item: {
+                                                        id: p.id.toString(),
+                                                        productId: p.id.toString(),
+                                                        name: p.title,
+                                                        slug: p.title.toLowerCase().replace(/\s+/g, '-'),
+                                                        price: parseInt(p.price.replace(/[^\d]/g, '')),
+                                                        image: p.image
+                                                    },
+                                                    quantity: 1,
+                                                    page: 'home'
+                                                }));
                                                 openLoginModal('addToCart');
                                                 return;
                                             }

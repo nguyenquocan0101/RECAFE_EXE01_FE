@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as adminApi from '@/services/api/admin';
 import { Button } from '@/components/common/Button';
+import { Modal } from '@/components/common/Modal';
 
 interface Category { id: string; name: string; }
 interface Product {
@@ -47,7 +48,34 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     categories,
     onSaveSuccess,
 }) => {
-    const [form, setForm] = useState(emptyForm);
+    const [form, setForm] = useState(() => {
+        if (editTarget) {
+            const matchedCategory = categories.find(c => c.name === editTarget.categoryName);
+            const resolvedCategoryId = editTarget.categoryId && editTarget.categoryId !== '00000000-0000-0000-0000-000000000000'
+                ? editTarget.categoryId
+                : (matchedCategory ? matchedCategory.id : (categories[0]?.id || ''));
+
+            return {
+                name: editTarget.name,
+                slug: editTarget.slug,
+                sku: editTarget.sku,
+                price: editTarget.price,
+                salePrice: editTarget.salePrice ?? '',
+                categoryId: resolvedCategoryId,
+                shortDescription: editTarget.shortDescription || '',
+                description: editTarget.description || '',
+                isPersonalizable: editTarget.isPersonalizable ?? false,
+                isActive: editTarget.isActive ?? true,
+                rewardPoints: editTarget.rewardPoints ?? 0,
+                material: editTarget.material || '',
+                size: editTarget.size || '',
+            };
+        }
+        return {
+            ...emptyForm,
+            categoryId: categories[0]?.id || '',
+        };
+    });
     const [saving, setSaving] = useState(false);
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
@@ -99,7 +127,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         ? imagePreviews
         : (editTarget?.images && editTarget.images.length > 0
             ? editTarget.images.map(img => img.imageUrl)
-            : (editTarget?.image ? [editTarget.image] : ['/assets/re_cup.png']));
+            : (editTarget?.thumbnailUrl ? [editTarget.thumbnailUrl] : (editTarget?.image ? [editTarget.image] : ['/assets/re_cup.png'])));
 
     useEffect(() => {
         setPreviewSelectedImageIdx(0);
@@ -203,10 +231,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         }
     };
 
-    if (!isOpen) return null;
-
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fade-in">
+        <Modal isOpen={isOpen} onClose={onClose} zIndex={50} className="animate-fade-in">
             <div className="bg-white rounded w-full max-w-[95vw] xl:max-w-[1350px] shadow-2xl h-[90vh] flex flex-col overflow-hidden border border-[#e8ddd5]/50 animate-slide-up">
                 
                 {/* Header */}
@@ -565,6 +591,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                     </Button>
                 </div>
             </div>
-        </div>
+        </Modal>
     );
 };

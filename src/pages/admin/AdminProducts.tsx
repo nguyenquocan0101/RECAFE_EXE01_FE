@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as adminApi from '@/services/api/admin';
+import { Modal } from '@/components/common/Modal';
 import { Button } from '@/components/common/Button';
 import { ProductModal } from './ProductModal';
 import { Upload3DModal } from './Upload3DModal';
@@ -40,6 +42,7 @@ const AdminProducts: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [upload3DTarget, setUpload3DTarget] = useState<Product | null>(null);
     const [view3DTarget, setView3DTarget] = useState<Product | null>(null);
+    const navigate = useNavigate();
 
     // Filter and menu states
     const [filterTab, setFilterTab] = useState<'all' | 'low' | 'archived'>('all');
@@ -118,7 +121,8 @@ const AdminProducts: React.FC = () => {
 
     const openEdit = async (p: Product) => {
         // Mở modal ngay với data có sẵn để UX không bị delay
-        setEditTarget(p);
+        const productWithImage = { ...p, thumbnailUrl: p.thumbnailUrl || p.image || getProductImage(p.id) };
+        setEditTarget(productWithImage);
         setModalOpen(true);
         // Fetch full data từ GET /api/admin/products/{id} (có isPersonalizable, model3DUrl...)
         try {
@@ -359,13 +363,10 @@ const AdminProducts: React.FC = () => {
                                     const { stock, percentage } = getProductStock(p.id);
                                     return (
                                         <tr key={p.id} className="hover:bg-[#FAF9F6]/50 transition-colors group">
-                                            {/* Product Info */}
                                             <td className="px-6 py-5">
-                                                <a 
-                                                    href={`/products/${p.slug}`} 
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer" 
-                                                    className="flex items-center gap-4 cursor-pointer group/item"
+                                                <button 
+                                                    onClick={() => navigate(`/products/${p.slug || p.id}`)} 
+                                                    className="flex items-center gap-4 cursor-pointer group/item text-left border-none bg-transparent w-full focus:outline-none outline-none p-0 shadow-none hover:bg-transparent"
                                                 >
                                                     <img 
                                                         src={p.thumbnailUrl || p.image || getProductImage(p.id)} 
@@ -385,7 +386,7 @@ const AdminProducts: React.FC = () => {
                                                             ) : null}
                                                         </div>
                                                     </div>
-                                                </a>
+                                                </button>
                                             </td>
 
                                             {/* SKU */}
@@ -592,13 +593,15 @@ const AdminProducts: React.FC = () => {
             )}
 
             {/* Product Modal Component */}
-            <ProductModal 
-                isOpen={modalOpen}
-                onClose={() => setModalOpen(false)}
-                editTarget={editTarget}
-                categories={categories}
-                onSaveSuccess={load}
-            />
+            {modalOpen && (
+                <ProductModal 
+                    isOpen={modalOpen}
+                    onClose={() => setModalOpen(false)}
+                    editTarget={editTarget}
+                    categories={categories}
+                    onSaveSuccess={load}
+                />
+            )}
 
             {/* Upload 3D Modal */}
             {upload3DTarget && (
@@ -616,15 +619,14 @@ const AdminProducts: React.FC = () => {
             )}
 
             {/* View 3D Modal */}
-            {view3DTarget && view3DTarget.model3DUrl && (
-                <div 
-                    style={{
-                        position: 'fixed', inset: 0, zIndex: 60,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', padding: '1rem',
-                    }}
-                    onClick={e => { if (e.target === e.currentTarget) setView3DTarget(null); }}
-                >
+            <Modal 
+                isOpen={!!(view3DTarget && view3DTarget.model3DUrl)} 
+                onClose={() => setView3DTarget(null)} 
+                zIndex={60}
+                closeOnOverlayClick={true}
+                style={{ padding: '1rem' }}
+            >
+                {view3DTarget && view3DTarget.model3DUrl && (
                     <div style={{
                         background: '#fff',
                         borderRadius: '16px',
@@ -672,12 +674,12 @@ const AdminProducts: React.FC = () => {
                             </React.Suspense>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </Modal>
 
             {/* Delete confirm */}
-            {deleteConfirm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+            <Modal isOpen={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} zIndex={50}>
+                {deleteConfirm && (
                     <div className="bg-white rounded w-full max-w-sm shadow-2xl p-6 border border-[#e8ddd5]/50 animate-slide-up">
                         <div className="w-12 h-12 rounded bg-red-50 flex items-center justify-center text-red-600 mb-4">
                             <svg width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -691,8 +693,8 @@ const AdminProducts: React.FC = () => {
                             <Button variant="danger" onClick={() => handleDelete(deleteConfirm)} className="px-4 py-2 text-xs">Xoá vĩnh viễn</Button>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
+            </Modal>
         </div>
     );
 };

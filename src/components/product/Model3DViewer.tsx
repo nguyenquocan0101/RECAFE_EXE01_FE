@@ -1,6 +1,10 @@
 import React, { Suspense, useRef, useState, useCallback } from 'react'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, Stage, useGLTF, Html, useProgress } from '@react-three/drei'
+import * as THREE from 'three'
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
+import { ThreeMFLoader } from 'three/examples/jsm/loaders/3MFLoader'
 
 // ─── Loading overlay ────────────────────────────────────────────────────────
 
@@ -32,11 +36,117 @@ function Loader() {
     )
 }
 
-// ─── GLTF Model ─────────────────────────────────────────────────────────────
+// ─── Model Renderer (Supports GLTF, GLB, STL, OBJ, 3MF) ─────────────────────
 
-function GLTFModel({ url }: { url: string }) {
-    const { scene } = useGLTF(url)
-    return <primitive object={scene} />
+function ModelRenderer({ url }: { url: string }) {
+    const lowerUrl = url.toLowerCase();
+    
+    const brownMaterial = React.useMemo(() => new THREE.MeshStandardMaterial({
+        color: '#4b2311',
+        roughness: 0.45,
+        metalness: 0.1
+    }), []);
+
+    if (lowerUrl.endsWith('.stl')) {
+        const geometry = useLoader(STLLoader, url);
+        geometry.center();
+        
+        const box = geometry.boundingBox || new THREE.Box3();
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 1.8 / (maxDim || 1);
+        
+        return (
+            <mesh geometry={geometry} scale={[scale, scale, scale]} material={brownMaterial} />
+        );
+    }
+    
+    if (lowerUrl.endsWith('.obj')) {
+        const obj = useLoader(OBJLoader, url);
+        
+        React.useMemo(() => {
+            obj.traverse((child: any) => {
+                if (child.isMesh) {
+                    child.material = brownMaterial;
+                }
+            });
+        }, [obj, brownMaterial]);
+
+        const box = new THREE.Box3().setFromObject(obj);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 1.8 / (maxDim || 1);
+        
+        return (
+            <primitive 
+                object={obj} 
+                position={[-center.x * scale, -center.y * scale, -center.z * scale]} 
+                scale={[scale, scale, scale]} 
+            />
+        );
+    }
+    
+    if (lowerUrl.endsWith('.3mf')) {
+        const obj3mf = useLoader(ThreeMFLoader, url);
+        
+        React.useMemo(() => {
+            obj3mf.traverse((child: any) => {
+                if (child.isMesh) {
+                    child.material = brownMaterial;
+                }
+            });
+        }, [obj3mf, brownMaterial]);
+
+        const box = new THREE.Box3().setFromObject(obj3mf);
+        const center = new THREE.Vector3();
+        box.getCenter(center);
+        
+        const size = new THREE.Vector3();
+        box.getSize(size);
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 1.8 / (maxDim || 1);
+        
+        return (
+            <primitive 
+                object={obj3mf} 
+                position={[-center.x * scale, -center.y * scale, -center.z * scale]} 
+                scale={[scale, scale, scale]} 
+            />
+        );
+    }
+    
+    // Default fallback to GLTF/GLB with full centering & scaling
+    const { scene } = useGLTF(url);
+    
+    React.useMemo(() => {
+        scene.traverse((child: any) => {
+            if (child.isMesh) {
+                child.material = brownMaterial;
+            }
+        });
+    }, [scene, brownMaterial]);
+
+    const box = new THREE.Box3().setFromObject(scene);
+    const center = new THREE.Vector3();
+    box.getCenter(center);
+    
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 1.8 / (maxDim || 1);
+    
+    return (
+        <primitive 
+            object={scene} 
+            position={[-center.x * scale, -center.y * scale, -center.z * scale]} 
+            scale={[scale, scale, scale]} 
+        />
+    );
 }
 
 // ─── Main Viewer ─────────────────────────────────────────────────────────────
@@ -167,20 +277,20 @@ export const Model3DViewer: React.FC<Model3DViewerProps> = ({ url, height = '420
 
                 {/* R3F Canvas */}
                 <Canvas
-                    camera={{ position: [0, 0, 5], fov: 60 }}
+                    camera={{ position: [0, 0, 3.0], fov: 50 }}
                     style={{ width: '100%', height: '100%' }}
                     onError={() => setLoadError(true)}
                 >
                     <Suspense fallback={<Loader />}>
-                        <Stage environment="city" intensity={0.5} adjustCamera={2.2}>
-                            <GLTFModel url={url} />
+                        <Stage environment="city" intensity={0.5} adjustCamera={1.5}>
+                            <ModelRenderer url={url} />
                         </Stage>
                         <OrbitControls
                             enablePan={false}
-                            minDistance={1}
+                            minDistance={0.5}
                             maxDistance={12}
-                            autoRotate
-                            autoRotateSpeed={1.2}
+                            autoRotate={true}
+                            autoRotateSpeed={1.5}
                         />
                     </Suspense>
                 </Canvas>

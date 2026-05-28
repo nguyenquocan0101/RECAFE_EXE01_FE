@@ -1,5 +1,6 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useAuth } from '@/context/AuthContext'
 
 interface ProductImage {
     id: string;
@@ -50,14 +51,24 @@ const ProductInfoCard: React.FC<ProductInfoCardProps> = ({
     handleBuyNow
 }) => {
     const { t, language } = useLanguage()
+    const { isAuthenticated, openLoginModal } = useAuth()
     const addBtnRef = useRef<HTMLButtonElement>(null)
     const [addedToCart, setAddedToCart] = useState(false)
 
-    const flyToCart = async () => {
+    useEffect(() => {
+        const handleTriggerFly = () => {
+            runOnlyFlyAnimation();
+        };
+        window.addEventListener('trigger-fly-to-cart', handleTriggerFly);
+        return () => {
+            window.removeEventListener('trigger-fly-to-cart', handleTriggerFly);
+        };
+    }, []);
+
+    const runOnlyFlyAnimation = () => {
         const cartBtn = document.getElementById('cart-icon-btn')
         const addBtn = addBtnRef.current
         if (!cartBtn || !addBtn) {
-            await handleAddToCart()
             return
         }
 
@@ -106,12 +117,39 @@ const ProductInfoCard: React.FC<ProductInfoCardProps> = ({
         // Remove dot after animation
         setTimeout(() => dot.remove(), 800)
 
-        // Call the actual add to cart
-        await handleAddToCart()
-
         // Show success state on button
         setAddedToCart(true)
         setTimeout(() => setAddedToCart(false), 1800)
+    }
+
+    const flyToCart = async () => {
+        runOnlyFlyAnimation()
+        await handleAddToCart()
+    }
+
+    const handleButtonClick = async () => {
+        if (!isAuthenticated) {
+            sessionStorage.setItem('pending_cart_action', JSON.stringify({
+                item: {
+                    id: dbProduct.id,
+                    productId: dbProduct.id,
+                    name: dbProduct.name,
+                    slug: dbProduct.slug,
+                    price: dbProduct.price,
+                    salePrice: dbProduct.salePrice,
+                    image: dbProduct.images && dbProduct.images.length > 0 
+                        ? dbProduct.images[0].imageUrl 
+                        : '/assets/re_cup.png',
+                    material: dbProduct.material || (language === 'vi' ? 'Bã cà phê tái chế sinh học' : 'Bio-recycled coffee grounds'),
+                    size: dbProduct.size || 'Standard'
+                },
+                quantity: quantity,
+                page: 'detail'
+            }));
+            openLoginModal('addToCart');
+            return;
+        }
+        await flyToCart();
     }
 
     const description = dbProduct.description || dbProduct.shortDescription || (language === 'vi' ? 'Sản phẩm làm từ bã cà phê tái chế chất lượng cao.' : 'High quality product made from recycled coffee grounds.');
@@ -231,7 +269,7 @@ const ProductInfoCard: React.FC<ProductInfoCardProps> = ({
                 {/* Add to Cart Button */}
                 <button 
                     ref={addBtnRef}
-                    onClick={flyToCart}
+                    onClick={handleButtonClick}
                     className={`w-full font-bold py-4 rounded-xl transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 shadow-xl border-none outline-none cursor-pointer ${
                         addedToCart
                             ? 'bg-[#4a7c28] shadow-[#4a7c28]/10 text-white'

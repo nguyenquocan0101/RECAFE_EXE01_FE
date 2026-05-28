@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
+import { Modal } from '@/components/common/Modal';
 
 interface LoginModalProps {
     isOpen: boolean;
@@ -71,9 +71,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, reason }) => {
         setError(null);
     };
 
-    return createPortal(
-        /* Backdrop: Transparent overlay with ONLY blur effect, no brown color scale as requested */
-        <div className="fixed inset-0 bg-black/[0.04] backdrop-blur-[10px] flex items-center justify-center z-[1000]" onClick={handleBackdropClick}>
+    return (
+        <Modal 
+            isOpen={isOpen} 
+            onClose={() => { resetFields(); onClose(); }} 
+            zIndex={1000}
+            closeOnOverlayClick={true}
+        >
             <div className="bg-white p-8 rounded shadow-2xl w-full max-w-[460px] border border-[#e8ddd5] relative mx-4 animate-pop-from-button">
                 {/* Close Button */}
                 <button 
@@ -382,8 +386,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, reason }) => {
                     )}
                 </div>
             </div>
-        </div>,
-        document.body
+        </Modal>
     );
 };
 
