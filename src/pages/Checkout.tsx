@@ -39,9 +39,11 @@ const Checkout: React.FC = () => {
     const [simulating, setSimulating] = useState(false)
     const [paymentSuccess, setPaymentSuccess] = useState(false)
 
-    const ecoShipping = cartTotal >= 500000 || cartTotal === 0 ? 0 : 120000; // ~5 USD in VND or standard 5.00 USD
+    const ecoShippingDisplay = cartTotal === 0 ? 0 : 30000;
+    const ecoShipping = 0;
     // Calculate final total based on currency (VND)
     const finalTotal = Math.max(0, cartTotal - promoDiscount + ecoShipping);
+    const displayTotal = Math.max(0, cartTotal - promoDiscount + ecoShippingDisplay);
 
     const handleApplyPromo = (e: React.FormEvent) => {
         e.preventDefault();
@@ -221,9 +223,9 @@ const Checkout: React.FC = () => {
                                 <div className="flex justify-between">
                                     <span>{language === 'vi' ? 'Phí vận chuyển Xanh' : 'Eco-Shipping'}</span>
                                     <span className="font-bold text-[#4b2311]">
-                                        {ecoShipping === 0 
+                                        {ecoShippingDisplay === 0 
                                             ? (language === 'vi' ? 'Miễn phí' : 'Free')
-                                            : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(ecoShipping)
+                                            : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(ecoShippingDisplay)
                                         }
                                     </span>
                                 </div>
@@ -256,7 +258,7 @@ const Checkout: React.FC = () => {
                                 <span className="font-bold text-sm text-[#4b2311] uppercase tracking-wide">{language === 'vi' ? 'TỔNG CỘNG' : 'Total'}</span>
                                 <div className="text-right">
                                     <span className="text-3xl font-black text-[#657b35] tracking-tight">
-                                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(finalTotal)}
+                                        {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(displayTotal)}
                                     </span>
                                     <span className="block text-[8px] font-bold text-[#68361c] uppercase tracking-widest mt-1">
                                         VND (VAT INCLUDED)

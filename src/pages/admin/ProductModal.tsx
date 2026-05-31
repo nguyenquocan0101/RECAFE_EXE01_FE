@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import * as adminApi from '@/services/api/admin';
 import { Button } from '@/components/common/Button';
 import { Modal } from '@/components/common/Modal';
@@ -24,7 +24,10 @@ interface Product {
     image?: string;
     thumbnailUrl?: string;
     images?: { imageUrl: string }[] | null;
+    model3DUrl?: string | null;
 }
+
+const Model3DViewer = React.lazy(() => import('@/components/product/Model3DViewer'));
 
 interface ProductModalProps {
     isOpen: boolean;
@@ -81,6 +84,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [replaceOldImages, setReplaceOldImages] = useState(true);
     const [previewSelectedImageIdx, setPreviewSelectedImageIdx] = useState(0);
+    const [model3DUrl, setModel3DUrl] = useState<string | null>(null);
+    const [uploading3D, setUploading3D] = useState(false);
+    const [show3DPreview, setShow3DPreview] = useState(false);
+    const [error3D, setError3D] = useState<string | null>(null);
+    const file3DInputRef = useRef<HTMLInputElement>(null);
 
     const slugify = (str: string) =>
         str.toLowerCase().trim().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -139,6 +147,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             setImagePreviews([]);
             setReplaceOldImages(true);
             setPreviewSelectedImageIdx(0);
+            setShow3DPreview(false);
+            setError3D(null);
             if (editTarget) {
                 const matchedCategory = categories.find(c => c.name === editTarget.categoryName);
                 const resolvedCategoryId = editTarget.categoryId && editTarget.categoryId !== '00000000-0000-0000-0000-000000000000'
@@ -160,14 +170,47 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                     material: editTarget.material || '',
                     size: editTarget.size || '',
                 });
+                setModel3DUrl(editTarget.model3DUrl || null);
             } else {
                 setForm({
                     ...emptyForm,
                     categoryId: categories[0]?.id || '',
                 });
+                setModel3DUrl(null);
             }
         }
     }, [editTarget, categories, isOpen]);
+
+    const handle3DFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !editTarget) return;
+
+        const MAX_SIZE = 25 * 1024 * 1024; // 25MB
+        const ACCEPTED_EXTS = ['.glb', '.gltf', '.stl', '.obj', '.3mf'];
+        const ext = '.' + file.name.split('.').pop()?.toLowerCase();
+        
+        if (!ACCEPTED_EXTS.includes(ext)) {
+            setError3D('Chỉ chấp nhận file .glb, .gltf, .stl, .obj hoặc .3mf');
+            return;
+        }
+        if (file.size > MAX_SIZE) {
+            setError3D(`File quá lớn (tối đa 25MB, file của bạn: ${(file.size / 1024 / 1024).toFixed(1)}MB)`);
+            return;
+        }
+
+        setError3D(null);
+        setUploading3D(true);
+        try {
+            const res = await adminApi.uploadProduct3DModel(editTarget.id, file);
+            const url = res?.data?.model3DUrl || res?.model3DUrl || res?.url || '';
+            setModel3DUrl(url);
+            onSaveSuccess();
+        } catch (err: any) {
+            setError3D(err.message || 'Upload thất bại');
+        } finally {
+            setUploading3D(false);
+        }
+    };
 
     const handleSave = async () => {
         if (!form.name.trim()) {
@@ -438,6 +481,90 @@ export const ProductModal: React.FC<ProductModalProps> = ({
                                 <span className="text-sm font-semibold text-[#4b2311]">Cho phép cá nhân hoá</span>
                             </label>
                         </div>
+
+                        {/* 3D Model Section (Only shown in Edit mode) */}
+                        {editTarget && (
+                            <div className="bg-[#fcfbf9]/80 border border-[#e8ddd5]/30 p-4 rounded space-y-3">
+                                <div className="text-xs font-bold text-[#68361c] uppercase tracking-widest pb-1 border-b border-[#e8ddd5]/20 flex items-center gap-1.5">
+                                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25" />
+                                    </svg>
+                                    Mô hình 3D (3D Model)
+                                </div>
+
+                                {model3DUrl ? (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center justify-between p-3 bg-white border border-[#e8ddd5] rounded-xl shadow-sm">
+                                            <div className="min-w-0 flex-1 mr-2">
+                                                <span className="block text-[8px] font-bold text-[#657b35] uppercase tracking-widest">ĐANG SỬ DỤNG</span>
+                                                <span className="block text-xs font-bold text-[#4b2311] truncate" title={model3DUrl}>
+                                                    {model3DUrl.split('/').pop() || 'model.glb'}
+                                                </span>
+                                            </div>
+                                            <div className="flex gap-2 shrink-0">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShow3DPreview(!show3DPreview)}
+                                                    className="px-3 py-1.5 bg-[#657b35] hover:bg-[#52642a] text-white text-xs font-bold rounded-lg border-0 cursor-pointer shadow flex items-center gap-1 transition-all"
+                                                >
+                                                    <span className="material-symbols-outlined text-sm">{show3DPreview ? 'visibility_off' : 'visibility'}</span>
+                                                    {show3DPreview ? 'Đóng xem' : 'Xem 3D'}
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setModel3DUrl(null)}
+                                                    className="px-3 py-1.5 bg-white hover:bg-[#FAF9F6] border border-[#eaddd2] text-xs font-bold text-[#68361c] rounded-lg cursor-pointer shadow-sm flex items-center gap-1 transition-all"
+                                                >
+                                                    <span className="material-symbols-outlined text-sm">upload_file</span>
+                                                    Thay thế
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Embedded 3D Viewer right inside ProductModal! */}
+                                        {show3DPreview && (
+                                            <div className="relative w-full h-[320px] border border-[#e8ddd5] rounded-xl overflow-hidden shadow-inner bg-[#FAF9F6] animate-slide-up">
+                                                <React.Suspense fallback={
+                                                    <div className="flex items-center justify-center h-full">
+                                                        <div className="w-8 h-8 border-4 border-[#657b35] border-t-transparent rounded-full animate-spin" />
+                                                    </div>
+                                                }>
+                                                    <Model3DViewer url={model3DUrl} height="100%" />
+                                                </React.Suspense>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        <div 
+                                            onClick={() => file3DInputRef.current?.click()}
+                                            className="border-2 border-dashed border-[#eaddd2] hover:border-[#657b35] rounded-xl p-6 text-center cursor-pointer transition bg-white flex flex-col items-center gap-2"
+                                        >
+                                            <input 
+                                                type="file" 
+                                                ref={file3DInputRef} 
+                                                onChange={handle3DFileChange}
+                                                accept=".glb,.gltf,.stl,.obj,.3mf"
+                                                className="hidden" 
+                                            />
+                                            <span className="material-symbols-outlined text-3xl text-[#68361c]/50">cloud_upload</span>
+                                            <span className="text-xs font-bold text-[#4b2311]">
+                                                {uploading3D ? 'Đang upload mô hình 3D...' : 'Chọn file 3D hoặc kéo thả vào đây'}
+                                            </span>
+                                            <span className="text-[9px] text-[#68361c]/50 font-semibold uppercase">
+                                                GLB, GLTF, STL, OBJ, 3MF (Tối đa 25MB)
+                                            </span>
+                                        </div>
+                                        {error3D && (
+                                            <div className="text-[10px] font-bold text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2 flex items-center gap-1.5 animate-slide-up">
+                                                <span className="material-symbols-outlined text-sm">error</span>
+                                                {error3D}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     {/* Right Column: Real-time Live Preview (ProductDetail style) */}
