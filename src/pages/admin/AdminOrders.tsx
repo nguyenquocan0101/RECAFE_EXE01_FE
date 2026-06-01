@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import * as adminApi from '@/services/api/admin';
 import { Modal } from '@/components/common/Modal';
+import { Button } from '@/components/common/Button';
 
 const ORDER_STATUSES = ['Pending', 'Confirmed', 'Preparing', 'Shipping', 'Completed', 'Cancelled', 'Returned'];
 
@@ -138,15 +139,16 @@ const AdminOrders: React.FC = () => {
                     </p>
                 </div>
                 <div>
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={loadOrders}
-                        className="flex items-center gap-2 px-4 py-2 bg-white border border-[#e8ddd5] rounded-none text-[#4b2311] text-xs font-semibold hover:bg-[#FAF6F0] shadow-sm transition-all cursor-pointer"
+                        className="!px-4 !py-2 !text-xs"
                     >
                         <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                             <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
                         </svg>
                         Làm mới danh sách
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -178,7 +180,7 @@ const AdminOrders: React.FC = () => {
                 <div className="flex items-center gap-1.5 flex-wrap shrink-0 self-start sm:self-auto">
                     <button
                         onClick={() => setFilterTab('all')}
-                        className={`px-3.5 py-2 text-xs font-bold rounded-none transition-all border cursor-pointer ${filterTab === 'all' ? 'bg-[#20150E] text-white border-[#20150E]' : 'bg-white text-[#68361c]/70 border-[#e8ddd5] hover:bg-[#FAF6F0]'}`}
+                        className={`px-3.5 py-2 text-xs font-bold rounded transition-all border cursor-pointer ${filterTab === 'all' ? 'bg-[#20150E] text-white border-[#20150E]' : 'bg-white text-[#68361c]/70 border-[#e8ddd5] hover:bg-[#FAF6F0]'}`}
                     >
                         Tất cả
                     </button>
@@ -186,7 +188,7 @@ const AdminOrders: React.FC = () => {
                         <button
                             key={status}
                             onClick={() => setFilterTab(status)}
-                            className={`px-3.5 py-2 text-xs font-bold rounded-none transition-all border cursor-pointer ${filterTab === status ? 'bg-[#20150E] text-white border-[#20150E]' : 'bg-white text-[#68361c]/70 border-[#e8ddd5] hover:bg-[#FAF6F0]'}`}
+                            className={`px-3.5 py-2 text-xs font-bold rounded transition-all border cursor-pointer ${filterTab === status ? 'bg-[#20150E] text-white border-[#20150E]' : 'bg-white text-[#68361c]/70 border-[#e8ddd5] hover:bg-[#FAF6F0]'}`}
                         >
                             {statusLabelVi[status]}
                         </button>
@@ -200,7 +202,7 @@ const AdminOrders: React.FC = () => {
                         placeholder="Tìm mã đơn, tên khách..."
                         value={searchQuery}
                         onChange={e => setSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2 bg-white border border-[#e8ddd5]/80 rounded-none text-xs font-medium text-[#4b2311] placeholder-[#68361c]/40 focus:outline-none focus:border-[#657b35] transition-all"
+                        className="w-full pl-9 pr-4 py-2 bg-white border border-[#e8ddd5]/80 rounded text-xs font-medium text-[#4b2311] placeholder-[#68361c]/40 focus:outline-none focus:border-[#657b35] transition-all"
                     />
                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#68361c]/40">
                         <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
@@ -220,11 +222,11 @@ const AdminOrders: React.FC = () => {
 
             {/* Main Table Card */}
             {loading ? (
-                <div className="flex items-center justify-center py-32 bg-white border border-[#e8ddd5]/60 rounded-none shadow-sm">
+                <div className="flex items-center justify-center py-32 bg-white border border-[#e8ddd5]/60 rounded shadow-sm">
                     <div className="w-9 h-9 border-4 border-[#657b35] border-t-transparent rounded-full animate-spin" />
                 </div>
             ) : (
-                <div className="bg-white rounded-none border border-[#e8ddd5]/60 overflow-hidden shadow-sm">
+                <div className="bg-white rounded border border-[#e8ddd5]/60 overflow-hidden shadow-sm">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left border-collapse">
                             <thead>
@@ -298,7 +300,7 @@ const AdminOrders: React.FC = () => {
                                                         </svg>
                                                     </button>
                                                     {activeMenuId === order.id && (
-                                                        <div className="absolute right-0 mt-1 w-36 bg-white border border-[#e8ddd5] rounded shadow-lg py-1.5 z-20 animate-slide-up">
+                                                        <div className="absolute right-0 mt-1 w-36 bg-white border border-[#e8ddd5]/60 rounded-xl shadow-xl py-1.5 z-20 animate-slide-up">
                                                             <button
                                                                 onClick={() => { setSelectedOrder(order); setActiveMenuId(null); }}
                                                                 className="w-full text-left px-4 py-2 text-xs font-bold text-[#68361c] hover:bg-[#FAF9F6] focus:outline-none outline-none border-none border-0 bg-transparent cursor-pointer shadow-none flex items-center gap-1.5"
@@ -353,7 +355,7 @@ const AdminOrders: React.FC = () => {
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                                     disabled={currentPage === 1}
-                                    className="w-8 h-8 flex items-center justify-center border border-[#e8ddd5]/60 bg-white rounded-none text-[#68361c]/60 hover:bg-stone-50 disabled:opacity-50 disabled:hover:bg-white transition-all cursor-pointer"
+                                    className="w-8 h-8 flex items-center justify-center border border-[#e8ddd5]/60 bg-white rounded text-[#68361c]/60 hover:bg-stone-50 disabled:opacity-50 disabled:hover:bg-white transition-all cursor-pointer"
                                 >
                                     <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
@@ -365,7 +367,7 @@ const AdminOrders: React.FC = () => {
                                     <button
                                         key={page}
                                         onClick={() => setCurrentPage(page)}
-                                        className={`w-8 h-8 rounded-none text-xs font-bold transition-all cursor-pointer ${currentPage === page ? 'bg-[#20150E] text-white' : 'border border-[#e8ddd5]/60 bg-white text-[#68361c]/60 hover:bg-stone-50'}`}
+                                        className={`w-8 h-8 rounded text-xs font-bold transition-all cursor-pointer ${currentPage === page ? 'bg-[#20150E] text-white' : 'border border-[#e8ddd5]/60 bg-white text-[#68361c]/60 hover:bg-stone-50'}`}
                                     >
                                         {page}
                                     </button>
@@ -375,7 +377,7 @@ const AdminOrders: React.FC = () => {
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                                     disabled={currentPage === totalPages}
-                                    className="w-8 h-8 flex items-center justify-center border border-[#e8ddd5]/60 bg-white rounded-none text-[#68361c]/60 hover:bg-stone-50 disabled:opacity-50 disabled:hover:bg-white transition-all cursor-pointer"
+                                    className="w-8 h-8 flex items-center justify-center border border-[#e8ddd5]/60 bg-white rounded text-[#68361c]/60 hover:bg-stone-50 disabled:opacity-50 disabled:hover:bg-white transition-all cursor-pointer"
                                 >
                                     <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
@@ -410,7 +412,7 @@ const AdminOrders: React.FC = () => {
                                             value={selectedOrder.status}
                                             onChange={(e) => handleStatusChange(selectedOrder.id, e.target.value)}
                                             disabled={updating === selectedOrder.id}
-                                            className="text-xs border border-[#e8ddd5] rounded-none px-3 py-1.5 text-[#4b2311] bg-white focus:outline-none focus:border-[#657b35] disabled:opacity-50 font-bold cursor-pointer"
+                                            className="text-xs border border-[#e8ddd5] rounded px-3 py-1.5 text-[#4b2311] bg-white focus:outline-none focus:border-[#657b35] disabled:opacity-50 font-bold cursor-pointer"
                                         >
                                             <option value={selectedOrder.status}>{statusLabelVi[selectedOrder.status]}</option>
                                             {ALLOWED_TRANSITIONS[selectedOrder.status].map(s => (
@@ -439,7 +441,7 @@ const AdminOrders: React.FC = () => {
                         <div className="flex-1 overflow-y-auto px-8 pt-3 pb-5 space-y-5">
                             
                             {/* Visual Status Tracker Flow */}
-                            <div className="bg-[#FAF7F5] rounded-none p-4">
+                            <div className="bg-[#FAF7F5] rounded-2xl border border-[#e8ddd5]/45 p-4">
                                 <span className="text-[9px] font-bold text-[#68361c]/50 uppercase tracking-widest block mb-3">Trình theo dõi trạng thái</span>
                                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 relative">
                                     {/* Visual timeline connector line */}
