@@ -94,3 +94,5 @@ dist-ssr/
 .vercel
 .env*.local
 FE_3D_CUSTOMIZATION_MVP.md
+FE_VOUCHER_PRODUCT_SCOPE_FLOW.md
+latest_swagger.json

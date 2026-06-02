@@ -190,3 +190,56 @@ export const getProducts = () =>
     fetch(`${apiUrl}api/Products`, {
         headers: { 'Content-Type': 'application/json', ...authHeader() }
     }).then(handleResponse);
+
+// ─── Coupons ────────────────────────────────────────────────────────────────
+
+export interface AdminCouponPayload {
+    code: string;
+    type: number;       // 0=Percentage, 1=FixedAmount
+    scope: number;      // 0=Order, 1=Product, 2=Category
+    value?: number;
+    maxDiscountAmount?: number | null;
+    minimumOrderAmount?: number | null;
+    usageLimit?: number;
+    startDate: string;  // ISO datetime
+    endDate: string;    // ISO datetime
+    isActive?: boolean;
+    productIds?: string[] | null;
+}
+
+export const getAdminCoupons = (params?: { isActive?: boolean; scope?: number; type?: number; keyword?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.isActive !== undefined) query.set('isActive', String(params.isActive));
+    if (params?.scope !== undefined) query.set('scope', String(params.scope));
+    if (params?.type !== undefined) query.set('type', String(params.type));
+    if (params?.keyword) query.set('keyword', params.keyword);
+    const qs = query.toString();
+    return fetch(`${apiUrl}api/admin/coupons${qs ? `?${qs}` : ''}`, {
+        headers: { 'Content-Type': 'application/json', ...authHeader() }
+    }).then(handleResponse);
+};
+
+export const getAdminCouponById = (id: string) =>
+    fetch(`${apiUrl}api/admin/coupons/${id}`, {
+        headers: { 'Content-Type': 'application/json', ...authHeader() }
+    }).then(handleResponse);
+
+export const createAdminCoupon = (data: AdminCouponPayload) =>
+    fetch(`${apiUrl}api/admin/coupons`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify(data)
+    }).then(handleResponse);
+
+export const updateAdminCoupon = (id: string, data: AdminCouponPayload) =>
+    fetch(`${apiUrl}api/admin/coupons/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify(data)
+    }).then(handleResponse);
+
+export const deleteAdminCoupon = (id: string) =>
+    fetch(`${apiUrl}api/admin/coupons/${id}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', ...authHeader() }
+    }).then(handleResponse);

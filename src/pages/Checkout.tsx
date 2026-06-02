@@ -4,6 +4,7 @@ import { useCart } from '@/context/CartContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useToast } from '@/context/ToastContext'
 import { checkoutOrder, simulateSepayWebhook } from '@/services/api/orders'
+import { previewCoupon, type CouponPreviewResponse } from '@/services/api/coupons'
 import SepayPaymentModal from '@/components/common/SepayPaymentModal'
 
 const Checkout: React.FC = () => {
@@ -20,8 +21,12 @@ const Checkout: React.FC = () => {
     } = useCart()
 
     const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank' | 'cod'>('cod')
-    const [promoCode, setPromoCode] = useState('')
-    const [promoDiscount, setPromoDiscount] = useState(0)
+
+    // Voucher state machine
+    const [voucherInput, setVoucherInput] = useState('')
+    const [voucherStatus, setVoucherStatus] = useState<'idle' | 'checking' | 'applied' | 'invalid' | 'stale'>('idle')
+    const [voucherPreview, setVoucherPreview] = useState<CouponPreviewResponse | null>(null)
+    const [voucherErrorMsg, setVoucherErrorMsg] = useState('')
     
     // Address fields
     const [firstName, setFirstName] = useState('An')
@@ -41,32 +46,47 @@ const Checkout: React.FC = () => {
 
     const ecoShippingDisplay = cartTotal === 0 ? 0 : 30000;
     const ecoShipping = 0;
+    const voucherDiscount = (voucherStatus === 'applied' || voucherStatus === 'stale') ? (voucherPreview?.discountAmount ?? 0) : 0;
     // Calculate final total based on currency (VND)
-    const finalTotal = Math.max(0, cartTotal - promoDiscount + ecoShipping);
-    const displayTotal = Math.max(0, cartTotal - promoDiscount + ecoShippingDisplay);
+    const finalTotal = Math.max(0, cartTotal - voucherDiscount + ecoShipping);
+    const displayTotal = Math.max(0, cartTotal - voucherDiscount + ecoShippingDisplay);
 
-    const handleApplyPromo = (e: React.FormEvent) => {
+    const handleApplyVoucher = async (e: React.FormEvent) => {
         e.preventDefault();
-        const code = promoCode.trim().toUpperCase();
-        
-        // Dynamically match any uppercase code ending in 1 or 2 digits (e.g., ECO10, RECAFE20, SALE15)
-        const match = code.match(/^[A-Z0-9]+?([0-9]{1,2})$/);
-        
-        if (match) {
-            const percent = parseInt(match[1], 10);
-            if (percent > 0 && percent <= 50) { // Limit discount percentage to max 50%
-                setPromoDiscount(Math.floor(cartTotal * (percent / 100)));
-                showToast(
-                    language === 'vi' 
-                        ? `Đã áp dụng mã giảm giá ${percent}%!` 
-                        : `${percent}% discount applied!`, 
-                    'success'
-                );
-                return;
-            }
+        const code = voucherInput.trim();
+        if (!code) return;
+
+        setVoucherStatus('checking');
+        setVoucherErrorMsg('');
+        try {
+            const data = await previewCoupon({
+                couponCode: code,
+                cartItemIds: cartItems.map(item => item.id)
+            });
+            setVoucherPreview(data);
+            setVoucherStatus('applied');
+            showToast(
+                language === 'vi' ? `Áp dụng voucher thành công!` : `Voucher applied!`,
+                'success'
+            );
+        } catch (err: any) {
+            setVoucherPreview(null);
+            setVoucherStatus('invalid');
+            setVoucherErrorMsg(err.message || (language === 'vi' ? 'Mã giảm giá không hợp lệ' : 'Invalid coupon code'));
         }
-        
-        showToast(language === 'vi' ? 'Mã giảm giá không hợp lệ' : 'Invalid promo code', 'error');
+    };
+
+    const handleRemoveVoucher = () => {
+        setVoucherInput('');
+        setVoucherPreview(null);
+        setVoucherStatus('idle');
+        setVoucherErrorMsg('');
+    };
+
+    const markVoucherStale = () => {
+        if (voucherStatus === 'applied') {
+            setVoucherStatus('stale');
+        }
     };
 
     const handleConfirmOrder = async () => {
@@ -89,7 +109,7 @@ const Checkout: React.FC = () => {
                     isDefault: false
                 },
                 note: `Họ tên: ${firstName} ${lastName} | SĐT: ${phone} | Địa chỉ: ${streetAddress}, ${ward}, ${district}, ${province}`,
-                couponCode: promoDiscount > 0 ? promoCode : null,
+                couponCode: voucherStatus === 'applied' ? voucherInput : null,
                 paymentMethod: mappedPaymentMethod,
                 cartItemIds: cartItems.map(item => item.id)
             };
@@ -112,6 +132,21 @@ const Checkout: React.FC = () => {
             }
         } catch (err: any) {
             console.warn("Backend order creation failed, falling back to Demo Mode:", err);
+
+            // If checkout failed due to voucher, reset voucher to stale so user sees the issue
+            const errMsg: string = err.message || '';
+            const isVoucherErr = /coupon|voucher|discount/i.test(errMsg);
+            if (isVoucherErr && voucherStatus === 'applied') {
+                setVoucherStatus('stale');
+                showToast(
+                    language === 'vi'
+                        ? `Voucher không còn hợp lệ: ${errMsg}. Vui lòng áp dụng lại.`
+                        : `Voucher error: ${errMsg}. Please re-apply.`,
+                    'error'
+                );
+                setSubmitting(false);
+                return;
+            }
             
             showToast(
                 language === 'vi' 
@@ -229,29 +264,76 @@ const Checkout: React.FC = () => {
                                         }
                                     </span>
                                 </div>
-                                {promoDiscount > 0 && (
+                                {voucherDiscount > 0 && (
                                     <div className="flex justify-between text-[#657b35] font-bold">
-                                        <span>{language === 'vi' ? `Giảm giá (${promoCode})` : `Discount (${promoCode})`}</span>
+                                        <span>{language === 'vi' ? `Giảm giá (${voucherInput})` : `Discount (${voucherInput})`}</span>
                                         <span>
-                                            -{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(promoDiscount)}
+                                            -{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(voucherDiscount)}
                                         </span>
                                     </div>
                                 )}
                             </div>
 
-                            {/* Promo Code Inline Form inside panel */}
-                            <form onSubmit={handleApplyPromo} className="flex gap-2">
-                                <input 
-                                    type="text" 
-                                    value={promoCode}
-                                    onChange={(e) => setPromoCode(e.target.value)}
-                                    placeholder="Enter discount code"
-                                    className="flex-1 bg-white border border-[#eaddd2] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-[#657b35] text-[#4b2311]"
-                                />
-                                <button type="submit" className="bg-[#657b35] hover:bg-[#798e3a] text-white font-extrabold px-6 rounded-xl text-xs transition-colors border-none cursor-pointer uppercase tracking-wider">
-                                    {language === 'vi' ? 'Áp dụng' : 'Apply'}
-                                </button>
-                            </form>
+                            {/* Voucher Section */}
+                            {voucherStatus === 'stale' && (
+                                <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-xl px-4 py-2.5 text-xs font-bold text-orange-700">
+                                    <span className="material-symbols-outlined text-sm">warning</span>
+                                    <span>{language === 'vi' ? 'Giỏ hàng thay đổi – vui lòng áp dụng lại voucher' : 'Cart changed – please re-apply voucher'}</span>
+                                </div>
+                            )}
+
+                            {voucherStatus === 'applied' && voucherPreview && (
+                                <div className="flex flex-col gap-1.5 bg-green-50 border border-green-200 rounded-xl px-4 py-3 text-xs">
+                                    <div className="flex items-center justify-between">
+                                        <span className="flex items-center gap-1.5 font-bold text-green-700">
+                                            <span className="material-symbols-outlined text-sm">check_circle</span>
+                                            {voucherInput}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={handleRemoveVoucher}
+                                            className="text-[10px] font-bold text-green-600 hover:text-red-500 transition-colors uppercase tracking-wider border-none bg-transparent cursor-pointer"
+                                        >
+                                            {language === 'vi' ? 'Bỏ' : 'Remove'}
+                                        </button>
+                                    </div>
+                                    {voucherPreview.inapplicableCartItemIds.length > 0 && (
+                                        <p className="text-[10px] text-green-600/80">
+                                            {language === 'vi'
+                                                ? `Áp dụng cho ${voucherPreview.applicableCartItemIds.length}/${voucherPreview.applicableCartItemIds.length + voucherPreview.inapplicableCartItemIds.length} sản phẩm`
+                                                : `Applied to ${voucherPreview.applicableCartItemIds.length}/${voucherPreview.applicableCartItemIds.length + voucherPreview.inapplicableCartItemIds.length} items`
+                                            }
+                                        </p>
+                                    )}
+                                </div>
+                            )}
+
+                            {voucherStatus !== 'applied' && (
+                                <form onSubmit={handleApplyVoucher} className="flex gap-2">
+                                    <input 
+                                        type="text" 
+                                        value={voucherInput}
+                                        onChange={(e) => setVoucherInput(e.target.value)}
+                                        placeholder={language === 'vi' ? 'Nhập mã voucher' : 'Enter voucher code'}
+                                        className="flex-1 bg-white border border-[#eaddd2] rounded-xl px-4 py-3 text-xs focus:outline-none focus:border-[#657b35] text-[#4b2311] disabled:opacity-60"
+                                        disabled={voucherStatus === 'checking'}
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={voucherStatus === 'checking' || !voucherInput.trim()}
+                                        className="bg-[#657b35] hover:bg-[#798e3a] disabled:opacity-50 text-white font-extrabold px-6 rounded-xl text-xs transition-colors border-none cursor-pointer uppercase tracking-wider flex items-center gap-1"
+                                    >
+                                        {voucherStatus === 'checking'
+                                            ? <span className="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                                            : (language === 'vi' ? 'Áp dụng' : 'Apply')
+                                        }
+                                    </button>
+                                </form>
+                            )}
+
+                            {voucherStatus === 'invalid' && voucherErrorMsg && (
+                                <p className="text-xs font-semibold text-red-600 -mt-2">{voucherErrorMsg}</p>
+                            )}
 
                             {/* Final Total */}
                             <div className="flex justify-between items-baseline pt-6 border-t border-[#eaddd2]/50">
@@ -337,7 +419,7 @@ const Checkout: React.FC = () => {
                             <div className="pt-4">
                                 <button 
                                     onClick={handleConfirmOrder}
-                                    disabled={submitting || cartItems.length === 0}
+                                    disabled={submitting || cartItems.length === 0 || voucherStatus === 'stale'}
                                     className="w-full bg-[#657b35] hover:bg-[#798e3a] disabled:opacity-50 text-white font-extrabold py-4 rounded-2xl transition-all shadow-xl shadow-[#657b35]/15 border-none cursor-pointer uppercase tracking-widest text-xs flex items-center justify-center gap-2"
                                 >
                                     <span>{submitting ? (language === 'vi' ? 'ĐANG ĐẶT HÀNG...' : 'PROCESSING...') : (language === 'vi' ? 'XÁC NHẬN ĐƠN HÀNG' : 'CONFIRM ORDER')}</span>
@@ -409,13 +491,13 @@ const Checkout: React.FC = () => {
 
                                                     {/* Quantity incrementer */}
                                                     <div className="detail-quantity-selector">
-                                                        <button onClick={() => updateQuantity(item.id, item.quantity - 1)}>−</button>
+                                                        <button onClick={() => { updateQuantity(item.id, item.quantity - 1); markVoucherStale(); }}>−</button>
                                                         <input 
                                                             type="number" 
                                                             value={item.quantity}
-                                                            onChange={(e) => updateQuantity(item.id, Math.max(0, Number(e.target.value)))}
+                                                            onChange={(e) => { updateQuantity(item.id, Math.max(0, Number(e.target.value))); markVoucherStale(); }}
                                                         />
-                                                        <button onClick={() => updateQuantity(item.id, item.quantity + 1)}>+</button>
+                                                        <button onClick={() => { updateQuantity(item.id, item.quantity + 1); markVoucherStale(); }}>+</button>
                                                     </div>
                                                 </div>
                                             </div>
@@ -429,7 +511,7 @@ const Checkout: React.FC = () => {
                                                 </span>
                                                 
                                                 <button 
-                                                    onClick={() => removeFromCart(item.id)}
+                                                    onClick={() => { removeFromCart(item.id); markVoucherStale(); }}
                                                     className="text-[11px] font-bold uppercase tracking-widest text-[#68361c]/50 hover:text-red-600 transition-colors border-none bg-transparent cursor-pointer p-0"
                                                 >
                                                     {language === 'vi' ? 'XÓA' : 'REMOVE'}

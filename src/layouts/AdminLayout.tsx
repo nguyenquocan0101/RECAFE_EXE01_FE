@@ -98,6 +98,18 @@ const AdminLayout: React.FC = () => {
                                 </svg>
                                 {sidebarOpen && <span>Người dùng</span>}
                             </NavLink>
+
+                            <NavLink to="/admin/coupons" className={navLink}>
+                                <svg width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="shrink-0">
+                                    <path d="M9 14l-4-4 4-4" />
+                                    <path d="M15 10h6" />
+                                    <path strokeLinecap="round" d="M3 12h6" />
+                                    <rect x="2" y="5" width="20" height="14" rx="2" />
+                                    <circle cx="8" cy="12" r="1" fill="currentColor" />
+                                    <line x1="12" y1="8" x2="18" y2="16" strokeLinecap="round" />
+                                </svg>
+                                {sidebarOpen && <span>Voucher</span>}
+                            </NavLink>
                         </>
                     )}
                 </nav>
