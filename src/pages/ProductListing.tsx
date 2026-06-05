@@ -24,7 +24,7 @@ const ProductListing: React.FC = () => {
     const { isAuthenticated, openLoginModal } = useAuth()
     const { addToCart } = useCart()
     const { showToast } = useToast()
-    const [priceRange, setPriceRange] = useState(150)
+    const [priceRange, setPriceRange] = useState<number | null>(null)
     const [selectedCategories, setSelectedCategories] = useState<string[]>([])
     const [selectedCollection, setSelectedCollection] = useState<string>('')
     const [currentPage, setCurrentPage] = useState(1)
@@ -78,7 +78,7 @@ const ProductListing: React.FC = () => {
 
     const filteredProducts = allProducts.filter(product => {
         const checkPrice = product.price > 1000 ? product.price / 1000 : product.price;
-        if (checkPrice > priceRange) return false
+        if (priceRange !== null && checkPrice > priceRange) return false
         if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) return false
         if (selectedCollection && product.collection !== selectedCollection) return false
         return true
@@ -157,15 +157,17 @@ const ProductListing: React.FC = () => {
                                 type="range"
                                 min="0"
                                 max="500"
-                                value={priceRange}
+                                value={priceRange ?? 500}
                                 onChange={(e) => setPriceRange(Number(e.target.value))}
                             />
                             <div className="price-slider-display">
                                 <span>{language === 'vi' ? '0 đ' : '$0'}</span>
                                 <span>
-                                    {language === 'vi'
-                                        ? `Lên đến ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(priceRange * 1000)}`
-                                        : `Up to $${priceRange}`}
+                                    {priceRange === null
+                                        ? (language === 'vi' ? 'Tất cả' : 'All')
+                                        : (language === 'vi'
+                                            ? `Lên đến ${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(priceRange * 1000)}`
+                                            : `Up to $${priceRange}`)}
                                 </span>
                             </div>
                         </div>
@@ -199,7 +201,7 @@ const ProductListing: React.FC = () => {
                                 onClick={() => {
                                     setSelectedCategories([])
                                     setSelectedCollection('')
-                                    setPriceRange(500)
+                                    setPriceRange(null)
                                 }}
                             >
                                 {t('products.clearFilters')}
