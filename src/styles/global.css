@@ -1546,6 +1546,7 @@ input, button, select, textarea {
   font-weight: 700;
   color: var(--text-dark);
   margin-bottom: 1.25rem;
+  line-height: 1.3;
 }
 
 .detail-story-header p {
@@ -1640,6 +1641,7 @@ input, button, select, textarea {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 2rem;
+  margin-top: 3rem;
 }
 
 .detail-stat-box {
@@ -1654,7 +1656,8 @@ input, button, select, textarea {
   font-size: 3rem;
   font-weight: 800;
   color: var(--primary);
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
 .detail-stat-percent.secondary-color {
@@ -2063,6 +2066,7 @@ input, button, select, textarea {
   font-weight: 700;
   color: var(--text-dark);
   margin-bottom: 1rem;
+  line-height: 1.3;
 }
 
 .partners-map-title p {
@@ -2262,7 +2266,7 @@ input, button, select, textarea {
   box-shadow: var(--shadow-lg);
   min-width: 240px;
   z-index: 10;
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 .map-popup-window::after {

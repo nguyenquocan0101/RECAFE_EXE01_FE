@@ -22,6 +22,17 @@ const Footer: React.FC = () => {
                                 <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
                             </svg>
                         </a>
+                        <a
+                            href="https://www.tiktok.com/@re.cafes"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="social-btn-footer"
+                            aria-label="TikTok"
+                        >
+                            <svg viewBox="0 0 448 512" width="20" height="20" fill="currentColor">
+                                <path d="M448 209.91a210.06 210.06 0 0 1-122.77-39.25v178.72A162.55 162.55 0 1 1 185 188.31v89.89a74.62 74.62 0 1 0 52.23 71.33V0h88a121.18 121.18 0 0 0 1.86 22.17A122.18 122.18 0 0 0 381 102.39a121.43 121.43 0 0 0 67 20.14z"/>
+                            </svg>
+                        </a>
                     </div>
                 </div>
                 

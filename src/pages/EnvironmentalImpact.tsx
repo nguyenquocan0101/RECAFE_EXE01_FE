@@ -8,6 +8,9 @@ interface Partner {
     addressEN: string
     donatedVI: string
     donatedEN: string
+    mapUrl: string
+    lat: number
+    lng: number
     x: number // Map coordinates percentage
     y: number
 }
@@ -21,33 +24,55 @@ const EnvironmentalImpact: React.FC = () => {
     const partners: Partner[] = [
         {
             id: 1,
-            name: 'The Highland Roastery',
-            addressVI: 'TP. Hồ Chí Minh, Quận 1',
-            addressEN: 'Ho Chi Minh City, Dist 1',
+            name: 'Passio Coffee',
+            addressVI: 'Lô T2-4, Đường D1, Khu Công Nghệ Cao, P. Tân Phú, TP. Thủ Đức, TP. HCM',
+            addressEN: 'Lot T2-4, D1 Road, High-Tech Park, Tan Phu Ward, Thu Duc City, HCMC',
             donatedVI: '1.200kg đã đóng góp',
             donatedEN: '1,200kg donated',
+            mapUrl: 'https://www.google.com/maps/place/Passio+Coffee/@10.8416878,106.8067476,17z/data=!3m1!4b1!4m6!3m5!1s0x3175276d9724ca93:0xdd707f9d67a751dd!8m2!3d10.8416878!4d106.8093225!16s%2Fg%2F11k0szmxkw?entry=ttu&g_ep=EgoyMDI2MDYxMy4wIKXMDSoASAFQAw%3D%3D',
+            lat: 10.8416878,
+            lng: 106.8093225,
             x: 52,
             y: 72
         },
         {
             id: 2,
-            name: 'Aroma Culture',
-            addressVI: 'Hà Nội, Phố Cổ',
-            addressEN: 'Hanoi, Old Quarter',
+            name: 'Deer Coffee - Nhà Văn Hóa Sinh Viên',
+            addressVI: 'Nhà Văn hóa Sinh viên TP.HCM, Lưu Hữu Phước, Đông Hòa, Dĩ An, Bình Dương',
+            addressEN: 'Student Cultural House, Luu Huu Phuoc, Dong Hoa, Di An, Binh Duong',
             donatedVI: '850kg đã đóng góp',
             donatedEN: '850kg donated',
+            mapUrl: 'https://www.google.com/maps/place/Deer+Coffee+-+Nh%C3%A0+V%C4%83n+H%C3%B3a+Sinh+Vi%C3%AAn/@10.8742508,106.8018667,15.35z/data=!4m22!1m15!4m14!1m6!1m2!1s0x3174d9004b8b550d:0x72c24bde5dadf6af!2zRGVlciBDb2ZmZWUgLSBOaMOgIFbEg24gSMOzYSBTaW5oIFZpw6puLCBWUkcyKzI3WCwgTMawdSBI4buvdSBQaMaw4bubYywgxJDDtG5nIEjDsmEsIEjhu5MgQ2jDrSBNaW5oLCBWaeG7h3QgTmFt!2m2!1d106.8006972!2d10.8751671!1m6!1m2!1s0x3174d9004b8b550d:0x72c24bde5dadf6af!2zRGVlciBDb2ZmZWUgLSBOaMOgIFbEg24gSMOzYSBTaW5oIFZpw6puLCBWUkcyKzI3WCwgTMawdSBI4buvdSBQaMaw4bubYywgxJDDtG5nIEjDsmEsIEjhu5MgQ2jDrSBNaW5oLCBWaeG7h3QgTmFt!2m2!1d106.8006972!2d10.8751671!3m5!1s0x3174d9004b8b550d:0x72c24bde5dadf6af!8m2!3d10.8751671!4d106.8006972!16s%2Fg%2F11vrtgdxfj?entry=ttu&g_ep=EgoyMDI2MDYxMy4wIKXMDSoASAFQAw%3D%3D',
+            lat: 10.8751671,
+            lng: 106.8006972,
             x: 48,
             y: 22
         },
         {
             id: 3,
-            name: 'Bean & Bloom',
-            addressVI: 'Đà Nẵng, Ven Biển',
-            addressEN: 'Da Nang, Beach Side',
+            name: 'Deer Coffee - S202 Vinhome Grand Park',
+            addressVI: 'Tòa S2.02, Vinhomes Grand Park, Long Thạnh Mỹ, TP. Thủ Đức, TP. HCM',
+            addressEN: 'Building S2.02, Vinhomes Grand Park, Long Thanh My, Thu Duc City, HCMC',
             donatedVI: '640kg đã đóng góp',
             donatedEN: '640kg donated',
+            mapUrl: 'https://www.google.com/maps/place/Deer+Coffee+-+S202+Vinhome+Grand+Park/@10.8386929,106.8294557,17z/data=!4m14!1m7!3m6!1s0x3175213625bfe0dd:0xe6e71005aac28bbf!2sDeer+Coffee+-+S202+Vinhome+Grand+Park!8m2!3d10.8386929!4d106.8320306!16s%2Fg%2F11l5frh63d!3m5!1s0x3175213625bfe0dd:0xe6e71005aac28bbf!8m2!3d10.8386929!4d106.8320306!16s%2Fg%2F11l5frh63d?entry=ttu&g_ep=EgoyMDI2MDYxMy4wIKXMDSoASAFQAw%3D%3D',
+            lat: 10.8386929,
+            lng: 106.8320306,
             x: 54,
             y: 45
+        },
+        {
+            id: 4,
+            name: 'Trà Sữa Betea - Nhà Văn Hóa Sinh Viên',
+            addressVI: 'Nhà Văn hóa Sinh viên TP.HCM, Lưu Hữu Phước, Đông Hòa, Dĩ An, Bình Dương',
+            addressEN: 'Student Cultural House, Luu Huu Phuoc, Dong Hoa, Di An, Binh Duong',
+            donatedVI: '520kg đã đóng góp',
+            donatedEN: '520kg donated',
+            mapUrl: 'https://www.google.com/maps/place/Tr%C3%A0+S%E1%BB%AFa+Betea+-+Nh%C3%A0+V%C4%83n+Ho%C3%A1+Sinh+Vi%C3%AAn/@10.8762916,106.7999108,17.08z/data=!4m22!1m15!4m14!1m6!1m2!1s0x3174d9cdadd2291d:0x7908c5de59d72e65!2zVHLDoCBT4buvYSBCZXRlYSAtIE5ow6AgVsSDbiBIb8OhIFNpbmggVmnDqm4sIFPDom4gVHLGsOG7m2MgTmjDoCBWxINuIEhvw6EsIEzGsHUgSOG7r3UgUGjGsOG7m2MgVMOibiBM4bqtcCwgxJDDtG5nIEjDsmEsIEjhu5MgQ2jDrSBNaW5oIDc1MzAwLCBWaeG7h3QgTmFt!2m2!1d106.8011427!2d10.8756599!1m6!1m2!1s0x3174d9cdadd2291d:0x7908c5de59d72e65!2zVHLDoCBT4buvYSBCZXRlYSAtIE5ow6AgVsSDbiBIb8OhIFNpbmggVmnDqm4sIFPDom4gVHLGsOG7m2MgTmjDoCBWxINuIEhvw6EsIEzGsHUgSOG7r3UgUGjGsOG7m2MgVMOibiBM4bqtcCwgxJDDtG5nIEjDsmEsIEjhu5MgQ2jDrSBNaW5oIDc1MzAwLCBWaeG7h3QgTmFt!2m2!1d106.8011427!2d10.8756599!3m5!1s0x3174d9cdadd2291d:0x7908c5de59d72e65!8m2!3d10.8756599!4d106.8011427!16s%2Fg%2F11wr1rfy_d?entry=ttu&g_ep=EgoyMDI2MDYxMy4wIKXMDSoASAFQAw%3D%3D',
+            lat: 10.8756599,
+            lng: 106.8011427,
+            x: 46,
+            y: 20
         }
     ]
 
@@ -130,7 +155,7 @@ const EnvironmentalImpact: React.FC = () => {
                                 <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                             </svg>
                         </div>
-                        <h3>12.5k</h3>
+                        <h3>1k</h3>
                         <h4>{t('impact.metricRecycledTitle')}</h4>
                         <p>{t('impact.metricRecycledDesc')}</p>
                     </div>
@@ -141,7 +166,7 @@ const EnvironmentalImpact: React.FC = () => {
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                             </svg>
                         </div>
-                        <h3>8,240</h3>
+                        <h3>5</h3>
                         <h4>{t('impact.metricItemsTitle')}</h4>
                         <p>{t('impact.metricItemsDesc')}</p>
                     </div>
@@ -155,7 +180,7 @@ const EnvironmentalImpact: React.FC = () => {
                                 <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
                             </svg>
                         </div>
-                        <h3>48</h3>
+                        <h3>3</h3>
                         <h4>{t('impact.metricPartnersTitle')}</h4>
                         <p>{t('impact.metricPartnersDesc')}</p>
                     </div>
@@ -278,11 +303,33 @@ const EnvironmentalImpact: React.FC = () => {
                                         <span className="address">
                                             {language === 'vi' ? p.addressVI : p.addressEN}
                                         </span>
-                                        <div className="donated-metric">
-                                            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-                                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"></path>
-                                            </svg>
-                                            {language === 'vi' ? p.donatedVI : p.donatedEN}
+                                        <div className="donated-metric" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                                <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+                                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"></path>
+                                                </svg>
+                                                {language === 'vi' ? p.donatedVI : p.donatedEN}
+                                            </div>
+                                            <a
+                                                href={p.mapUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                onClick={(e) => e.stopPropagation()}
+                                                style={{
+                                                    color: 'var(--primary)',
+                                                    textDecoration: 'underline',
+                                                    fontSize: '0.8rem',
+                                                    fontWeight: 600,
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    gap: '2px'
+                                                }}
+                                            >
+                                                {language === 'vi' ? 'Bản đồ' : 'Map'}
+                                                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />
+                                                </svg>
+                                            </a>
                                         </div>
                                     </div>
                                 ))}
@@ -293,43 +340,18 @@ const EnvironmentalImpact: React.FC = () => {
                         </div>
 
                         {/* Map Panel */}
-                        <div className="map-display-panel">
+                        <div className="map-display-panel" style={{ overflow: 'hidden' }}>
                             {viewMode === 'map' ? (
-                                <div className="map-canvas-mockup">
-                                    <svg className="svg-map-bg" viewBox="0 0 400 600" fill="none" stroke="#cfc7ba" strokeWidth="1.5">
-                                        <path d="M180,60 C170,80 160,90 170,110 C180,130 200,160 210,180 C220,200 210,230 220,260 C230,290 260,330 265,370 C270,410 260,450 250,490 C240,510 200,530 190,560" strokeDasharray="4 4" />
-                                        <circle cx="210" cy="180" r="40" fill="#eae3d5" opacity="0.3" />
-                                        <circle cx="265" cy="370" r="50" fill="#eae3d5" opacity="0.3" />
-                                        <circle cx="190" cy="560" r="45" fill="#eae3d5" opacity="0.3" />
-                                    </svg>
-
-                                    {/* Partner pins */}
-                                    {partners.map(p => (
-                                        <div
-                                            key={p.id}
-                                            className={`map-marker ${activePartnerId === p.id ? 'active' : ''}`}
-                                            style={{ left: `${p.x}%`, top: `${p.y}%` }}
-                                            onClick={() => setActivePartnerId(p.id)}
-                                        >
-                                            <div className="map-marker-pin">
-                                                <div className="map-marker-dot"></div>
-                                            </div>
-                                        </div>
-                                    ))}
-
-                                    {/* Active Partner Info Window */}
-                                    <div className="map-popup-window">
-                                        <h5>{activePartner.name}</h5>
-                                        <p>{language === 'vi' ? activePartner.addressVI : activePartner.addressEN}</p>
-                                        <span>{language === 'vi' ? activePartner.donatedVI : activePartner.donatedEN}</span>
-                                    </div>
-
-                                    <button className="expand-map-btn" onClick={() => alert('Tính năng mở rộng bản đồ đang được phát triển!')}>
-                                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
-                                            <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>
-                                        </svg>
-                                        {language === 'vi' ? 'Mở rộng bản đồ' : 'Expand Map'}
-                                    </button>
+                                <div style={{ width: '100%', height: '100%', minHeight: '560px', position: 'relative' }}>
+                                    <iframe
+                                        title={activePartner.name}
+                                        src={`https://maps.google.com/maps?q=${activePartner.lat},${activePartner.lng}&z=16&output=embed`}
+                                        width="100%"
+                                        height="100%"
+                                        style={{ border: 0, minHeight: '560px', width: '100%', height: '100%' }}
+                                        allowFullScreen
+                                        loading="lazy"
+                                    ></iframe>
                                 </div>
                             ) : (
                                 <div style={{ padding: '3rem', height: '100%', backgroundColor: 'var(--white)' }}>
@@ -340,6 +362,7 @@ const EnvironmentalImpact: React.FC = () => {
                                                 <th style={{ padding: '1rem 0' }}>{t('impact.tableColName')}</th>
                                                 <th>{t('impact.tableColLocation')}</th>
                                                 <th>{t('impact.tableColDonated')}</th>
+                                                <th>{language === 'vi' ? 'Bản đồ' : 'Map'}</th>
                                                 <th>{t('impact.tableColStatus')}</th>
                                             </tr>
                                         </thead>
@@ -350,6 +373,27 @@ const EnvironmentalImpact: React.FC = () => {
                                                     <td>{language === 'vi' ? p.addressVI : p.addressEN}</td>
                                                     <td style={{ color: 'var(--accent)', fontWeight: 700 }}>
                                                         {language === 'vi' ? p.donatedVI.replace(' đã đóng góp', '') : p.donatedEN.replace(' donated', '')}
+                                                    </td>
+                                                    <td>
+                                                        <a 
+                                                            href={p.mapUrl} 
+                                                            target="_blank" 
+                                                            rel="noopener noreferrer"
+                                                            style={{
+                                                                color: 'var(--primary)',
+                                                                textDecoration: 'underline',
+                                                                fontWeight: 600,
+                                                                fontSize: '0.9rem',
+                                                                display: 'inline-flex',
+                                                                alignItems: 'center',
+                                                                gap: '4px'
+                                                            }}
+                                                        >
+                                                            {language === 'vi' ? 'Xem' : 'View'}
+                                                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />
+                                                            </svg>
+                                                        </a>
                                                     </td>
                                                     <td><span style={{ backgroundColor: 'var(--accent-light)', color: 'var(--accent)', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.8rem', fontWeight: 700 }}>{t('impact.active')}</span></td>
                                                 </tr>

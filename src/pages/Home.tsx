@@ -330,6 +330,7 @@ const Home: React.FC = () => {
                         <div className="partner-brand-logos">
                             <img src="/assets/passio.jpg" alt="Passio Coffee" className="partner-brand-logo" />
                             <img src="/assets/deerlogo.png" alt="Deer Coffee" className="partner-brand-logo" />
+                            <img src="/assets/betealogo.png" alt="Betea" className="partner-brand-logo" />
                         </div>
                     </div>
                 </div>
