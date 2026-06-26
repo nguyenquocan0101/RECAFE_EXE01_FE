@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Link, NavLink, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { useLanguage } from '@/context/LanguageContext'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
@@ -11,9 +11,25 @@ const Header: React.FC = () => {
     const { showToast } = useToast()
     const { cartCount } = useCart()
     const navigate = useNavigate()
+    const location = useLocation()
     const [dropdownOpen, setDropdownOpen] = useState(false)
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
     const [mobileDropdownOpen, setMobileDropdownOpen] = useState(false)
+
+    const handleOurStoryClick = (e: React.MouseEvent) => {
+        e.preventDefault()
+        setMobileMenuOpen(false)
+        if (location.pathname === '/') {
+            const el = document.getElementById('our-story')
+            if (el) el.scrollIntoView({ behavior: 'smooth' })
+        } else {
+            navigate('/')
+            setTimeout(() => {
+                const el = document.getElementById('our-story')
+                if (el) el.scrollIntoView({ behavior: 'smooth' })
+            }, 300)
+        }
+    }
 
     const navLinkClass = ({ isActive }: { isActive: boolean }) =>
         `text-[0.95rem] font-medium transition-colors duration-200 relative py-1 hover:text-primary ${
@@ -60,11 +76,7 @@ const Header: React.FC = () => {
                     <a
                         href="#our-story"
                         className="text-[0.95rem] font-medium text-text-muted relative py-1 hover:text-primary transition-colors duration-200"
-                        onClick={(e) => {
-                            e.preventDefault()
-                            const el = document.getElementById('our-story')
-                            if (el) el.scrollIntoView({ behavior: 'smooth' })
-                        }}
+                        onClick={handleOurStoryClick}
                     >
                         {t('header.ourStory')}
                     </a>
@@ -258,7 +270,7 @@ const Header: React.FC = () => {
                             {t('header.products')}
                         </NavLink>
                         <a href="#our-story" style={{ fontSize: '1.1rem', padding: '0.75rem 0', borderBottom: '1px solid #f0ebe4', color: 'var(--text-muted)', fontWeight: 500 }}
-                            onClick={(e) => { e.preventDefault(); setMobileMenuOpen(false); setTimeout(() => { const el = document.getElementById('our-story'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 150); }}>
+                            onClick={handleOurStoryClick}>
                             {t('header.ourStory')}
                         </a>
                         <NavLink to="/environmental-impact" className={navLinkClass} onClick={() => setMobileMenuOpen(false)} style={{ fontSize: '1.1rem', padding: '0.75rem 0', borderBottom: '1px solid #f0ebe4' }}>

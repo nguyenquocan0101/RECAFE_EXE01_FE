@@ -20,6 +20,7 @@ const EnvironmentalImpact: React.FC = () => {
     const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
     const [searchQuery, setSearchQuery] = useState('')
     const [activePartnerId, setActivePartnerId] = useState(1)
+    const [isMuted, setIsMuted] = useState(true)
 
     const partners: Partner[] = [
         {
@@ -243,6 +244,45 @@ const EnvironmentalImpact: React.FC = () => {
                                 </svg>
                             </a>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Video Showcase Section */}
+            <section className="impact-video-section">
+                <div className="impact-video-container">
+                    <div className="impact-video-header">
+                        <h2>{language === 'vi' ? 'Hành trình lan tỏa giá trị' : 'Our Circular Impact Journey'}</h2>
+                        <p>{language === 'vi' ? 'Hãy xem video giới thiệu về cách RE:CAFÉ thu gom, xử lý bã cà phê và tái sinh thành các sản phẩm decor cao cấp.' : 'Watch our short story on how RE:CAFÉ upcycles coffee waste into premium decorative products.'}</p>
+                    </div>
+                    
+                    <div className="impact-video-wrapper">
+                        <video 
+                            src="https://res.cloudinary.com/dloqwnbxo/video/upload/v1782430748/string/RE_CAF%C3%89_TVC_Vietnamese_tr6r5m.mp4" 
+                            autoPlay 
+                            muted={isMuted}
+                            loop
+                            playsInline
+                            className="impact-video"
+                        />
+                        <button 
+                            type="button"
+                            className="video-mute-btn" 
+                            onClick={() => setIsMuted(!isMuted)}
+                            aria-label={isMuted ? "Unmute video" : "Mute video"}
+                        >
+                            {isMuted ? (
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                    <path d="M9 9v6a3 3 0 0 0 3 3h1.586l4.707 4.707A1 1 0 0 0 20 22V4a1 1 0 0 0-1.707-.707L13.586 8H12a3 3 0 0 0-3 3z"></path>
+                                </svg>
+                            ) : (
+                                <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                </svg>
+                            )}
+                        </button>
                     </div>
                 </div>
             </section>

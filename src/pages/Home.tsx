@@ -25,6 +25,7 @@ const Home: React.FC = () => {
 
     const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>([])
     const [loading, setLoading] = useState(true)
+    const [isMuted, setIsMuted] = useState(true)
 
     useEffect(() => {
         setLoading(true);
@@ -169,8 +170,33 @@ const Home: React.FC = () => {
                     </div>
 
                     <div className="story-right">
-                        <div className="story-image-large">
-                            <img src="/assets/coffee_grounds.png" alt="Coffee Grounds Heap" />
+                        <div className="story-video-wrapper">
+                            <video 
+                                src="https://res.cloudinary.com/dloqwnbxo/video/upload/v1782430748/string/RE_CAF%C3%89_TVC_Vietnamese_tr6r5m.mp4" 
+                                autoPlay 
+                                muted={isMuted}
+                                loop
+                                playsInline
+                                className="story-video"
+                            />
+                            <button 
+                                type="button"
+                                className="video-mute-btn" 
+                                onClick={() => setIsMuted(!isMuted)}
+                                aria-label={isMuted ? "Unmute video" : "Mute video"}
+                            >
+                                {isMuted ? (
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                                        <path d="M9 9v6a3 3 0 0 0 3 3h1.586l4.707 4.707A1 1 0 0 0 20 22V4a1 1 0 0 0-1.707-.707L13.586 8H12a3 3 0 0 0-3 3z"></path>
+                                    </svg>
+                                ) : (
+                                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
+                                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                    </svg>
+                                )}
+                            </button>
                         </div>
                         <div className="story-image-small">
                             <img src="/assets/re_tray.png" alt="Hands on tile composite" />
