@@ -27,6 +27,22 @@ const SepayPaymentModal: React.FC<SepayPaymentModalProps> = ({
 
     if (!isOpen) return null
 
+    const getBankDetails = () => {
+        const defaultDetails = { acc: '123456789', bank: 'MBBank' };
+        if (!createdOrder?.paymentQrUrl) return defaultDetails;
+        try {
+            const urlObj = new URL(createdOrder.paymentQrUrl);
+            const acc = urlObj.searchParams.get('acc') || defaultDetails.acc;
+            const bank = urlObj.searchParams.get('bank') || defaultDetails.bank;
+            return { acc, bank };
+        } catch {
+            return defaultDetails;
+        }
+    };
+
+    const { acc, bank } = getBankDetails();
+    const memo = `RECAFE ${createdOrder?.orderCode || (createdOrder?.id ? createdOrder.id.slice(0, 8) : '')}`;
+
     const handleCopy = (text: string, label: string) => {
         navigator.clipboard.writeText(text)
         showToast(
@@ -92,7 +108,7 @@ const SepayPaymentModal: React.FC<SepayPaymentModalProps> = ({
                                 {/* QR code card */}
                                 <div className="md:col-span-5 flex flex-col items-center justify-center p-4 bg-[#fcfbf9] rounded-[24px] group">
                                     <img 
-                                        src={createdOrder?.paymentQrUrl || `https://img.vietqr.io/image/vietinbank-123456789-qr_only.png?amount=${finalTotal}&addInfo=RECAFE%20${createdOrder?.id?.slice(0, 8)}&accountName=RE%20CAFE%20VIETNAM`} 
+                                        src={createdOrder?.paymentQrUrl || `https://img.vietqr.io/image/${bank.toLowerCase()}-${acc}-qr_only.png?amount=${finalTotal}&addInfo=${encodeURIComponent(memo)}`} 
                                         alt="VietQR Payment Code" 
                                         className="w-48 h-48 object-contain rounded-xl group-hover:scale-105 transition-transform duration-300 bg-white"
                                     />
@@ -107,16 +123,16 @@ const SepayPaymentModal: React.FC<SepayPaymentModalProps> = ({
                                     {/* Bank */}
                                     <div className="flex justify-between items-center py-2.5 border-b border-[#eaddd2]/40">
                                         <span className="font-bold text-[#68361c]/70 uppercase tracking-wider text-[10px]">Ngân hàng</span>
-                                        <span className="font-bold text-[#4b2311] text-right">VietinBank (ICB)</span>
+                                        <span className="font-bold text-[#4b2311] text-right">{bank}</span>
                                     </div>
 
                                     {/* Account number */}
                                     <div className="flex justify-between items-center py-2.5 border-b border-[#eaddd2]/40">
                                         <span className="font-bold text-[#68361c]/70 uppercase tracking-wider text-[10px]">Số tài khoản</span>
                                         <div className="flex items-center gap-2">
-                                            <span className="font-mono font-bold text-[#4b2311]">123456789</span>
+                                            <span className="font-mono font-bold text-[#4b2311]">{acc}</span>
                                             <button 
-                                                onClick={() => handleCopy('123456789', language === 'vi' ? 'số tài khoản' : 'account number')}
+                                                onClick={() => handleCopy(acc, language === 'vi' ? 'số tài khoản' : 'account number')}
                                                 className="text-[10px] font-bold text-[#657b35] hover:underline cursor-pointer border-none bg-transparent"
                                             >
                                                 {language === 'vi' ? 'Sao chép' : 'Copy'}
@@ -151,10 +167,10 @@ const SepayPaymentModal: React.FC<SepayPaymentModalProps> = ({
                                         <span className="font-bold text-[#68361c]/70 uppercase tracking-wider text-[10px]">Nội dung</span>
                                         <div className="flex items-center gap-2">
                                             <span className="font-mono font-bold bg-amber-50 px-2 py-1 rounded text-[#4b2311] border border-[#eaddd2]/60">
-                                                {`RECAFE ${createdOrder?.id?.slice(0, 8)}`}
+                                                {memo}
                                             </span>
                                             <button 
-                                                onClick={() => handleCopy(`RECAFE ${createdOrder?.id?.slice(0, 8)}`, language === 'vi' ? 'nội dung chuyển khoản' : 'memo')}
+                                                onClick={() => handleCopy(memo, language === 'vi' ? 'nội dung chuyển khoản' : 'memo')}
                                                 className="text-[10px] font-bold text-[#657b35] hover:underline cursor-pointer border-none bg-transparent"
                                             >
                                                 {language === 'vi' ? 'Sao chép' : 'Copy'}
@@ -164,35 +180,34 @@ const SepayPaymentModal: React.FC<SepayPaymentModalProps> = ({
                                 </div>
                             </div>
 
-                            {/* Simulator Box */}
-                            <div className="pt-6 border-t border-[#eaddd2]/40 space-y-4">
-                                <div className="flex items-center gap-2">
-                                    <span className="h-px bg-[#eaddd2] flex-1"></span>
-                                    <span className="text-[9px] font-bold text-[#68361c]/50 uppercase tracking-widest shrink-0">  cổng thanh toán Sepay</span>
-                                    <span className="h-px bg-[#eaddd2] flex-1"></span>
-                                </div>
+                            {/* Simulator Box (Only in development/test environment) */}
+                            {import.meta.env.DEV && (
+                                <div className="pt-6 border-t border-[#eaddd2]/40 space-y-4">
+                                    <div className="flex items-center gap-2">
+                                        <span className="h-px bg-[#eaddd2] flex-1"></span>
+                                        <span className="text-[9px] font-bold text-[#68361c]/50 uppercase tracking-widest shrink-0">Cổng thanh toán Sepay (Demo)</span>
+                                        <span className="h-px bg-[#eaddd2] flex-1"></span>
+                                    </div>
 
-                                <button 
-                                    onClick={onSimulateWebhook}
-                                    disabled={simulating}
-                                    className="w-full bg-[#657b35] hover:bg-[#798e3a] disabled:opacity-50 text-white font-extrabold py-3.5 px-6 rounded-2xl shadow-lg transition-all border-none cursor-pointer uppercase tracking-wider text-[11px] flex items-center justify-center gap-2"
-                                >
-                                    {simulating ? (
-                                        <>
-                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                            <span>ĐANG KÍCH HOẠT WEBHOOK...</span>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span className="material-symbols-outlined text-sm">bolt</span>
-                                            <span> Đã thanh toán</span>
-                                        </>
-                                    )}
-                                </button>
-                                {/* <p className="text-[10px] font-medium text-center text-[#68361c]/70">
-                                    * Hệ thống sẽ gửi một request `POST /api/sepay-webhook` chứa `code: ${createdOrder?.id}` để   giao dịch ngân hàng thành công thực tế.
-                                </p> */}
-                            </div>
+                                    <button 
+                                        onClick={onSimulateWebhook}
+                                        disabled={simulating}
+                                        className="w-full bg-[#657b35] hover:bg-[#798e3a] disabled:opacity-50 text-white font-extrabold py-3.5 px-6 rounded-2xl shadow-lg transition-all border-none cursor-pointer uppercase tracking-wider text-[11px] flex items-center justify-center gap-2"
+                                    >
+                                        {simulating ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                <span>ĐANG KÍCH HOẠT WEBHOOK...</span>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <span className="material-symbols-outlined text-sm">bolt</span>
+                                                <span> Giả lập thanh toán</span>
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            )}
                         </>
                     )}
                 </div>
