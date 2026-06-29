@@ -20,7 +20,7 @@ const Checkout: React.FC = () => {
         clearCart
     } = useCart()
 
-    const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank' | 'cod'>('cod')
+    const [paymentMethod, setPaymentMethod] = useState<'card' | 'bank' | 'cod'>('bank')
 
     // Voucher state machine
     const [voucherInput, setVoucherInput] = useState('')
