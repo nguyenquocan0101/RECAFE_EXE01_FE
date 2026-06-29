@@ -96,3 +96,12 @@ export const getMyOrders = async () => {
     return handleResponse(response);
 };
 
+export const getOrderById = async (id: string) => {
+    const response = await fetch(`${apiUrl}api/orders/${id}`, {
+        method: 'GET',
+        headers: getHeaders()
+    });
+    return handleResponse(response);
+};
+
+

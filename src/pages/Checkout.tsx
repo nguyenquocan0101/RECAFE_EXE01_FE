@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '@/context/CartContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useToast } from '@/context/ToastContext'
-import { checkoutOrder, simulateSepayWebhook } from '@/services/api/orders'
+import { checkoutOrder, simulateSepayWebhook, getOrderById } from '@/services/api/orders'
 import { previewCoupon, type CouponPreviewResponse } from '@/services/api/coupons'
 import SepayPaymentModal from '@/components/common/SepayPaymentModal'
 
@@ -43,6 +43,45 @@ const Checkout: React.FC = () => {
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false)
     const [simulating, setSimulating] = useState(false)
     const [paymentSuccess, setPaymentSuccess] = useState(false)
+
+    // Polling order status to check for payment success
+    useEffect(() => {
+        if (!isPaymentModalOpen || !createdOrder?.id || paymentSuccess) return;
+
+        let intervalId: NodeJS.Timeout;
+
+        const checkPaymentStatus = async () => {
+            try {
+                const response = await getOrderById(createdOrder.id);
+                const orderData = response?.data;
+                if (orderData && (orderData.paymentStatus === 'Paid' || orderData.paymentStatus?.toLowerCase() === 'paid')) {
+                    setPaymentSuccess(true);
+                    showToast(
+                        language === 'vi' 
+                            ? 'Thanh toán qua Sepay thành công!' 
+                            : 'Sepay payment successfully matched!', 
+                        'success'
+                    );
+                    await clearCart();
+                    
+                    setTimeout(() => {
+                        setIsPaymentModalOpen(false);
+                        navigate('/profile');
+                    }, 2500);
+                }
+            } catch (error) {
+                console.error("Error polling order payment status:", error);
+            }
+        };
+
+        // Poll immediately and then every 3 seconds
+        checkPaymentStatus();
+        intervalId = setInterval(checkPaymentStatus, 3000);
+
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, [isPaymentModalOpen, createdOrder, paymentSuccess, navigate, clearCart, language, showToast]);
 
     const ecoShippingDisplay = cartTotal === 0 ? 0 : 30000;
     const ecoShipping = 0;
