@@ -60,8 +60,12 @@ const SepayPaymentModal: React.FC<SepayPaymentModalProps> = ({
                         {language === 'vi' ? 'Thanh Toán Đơn Hàng' : 'Payment Instruction'}
                     </h3>
                     {!paymentSuccess && (
-                        <button 
-                            onClick={onClose} 
+                        <button
+                            onClick={() => {
+                                if (window.confirm(language === 'vi' ? 'Bạn có chắc muốn đóng modal thanh toán?' : 'Are you sure you want to close the payment modal?')) {
+                                    onClose();
+                                }
+                            }}
                             className="w-8 h-8 rounded-full border border-[#eaddd2] text-[#68361c] hover:bg-neutral-100 flex items-center justify-center transition-colors cursor-pointer text-sm p-0 focus:outline-none bg-transparent"
                         >
                             ✕

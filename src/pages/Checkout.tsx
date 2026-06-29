@@ -134,7 +134,11 @@ const Checkout: React.FC = () => {
             return;
         }
 
-        setSubmitting(true);
+        if (!window.confirm(language === 'vi' ? 'Bạn có chắc muốn đặt đơn hàng?' : 'Are you sure you want to place the order?')) {
+  setSubmitting(false);
+  return;
+}
+setSubmitting(true);
         try {
             const mappedPaymentMethod = paymentMethod === 'cod' ? 0 : paymentMethod === 'bank' ? 1 : 2;
             const payload = {
