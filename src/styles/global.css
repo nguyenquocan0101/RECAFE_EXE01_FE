@@ -325,7 +325,7 @@ input, button, select, textarea {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, rgba(229, 223, 216, 0.5) 20%, rgba(229, 223, 216, 0.3) 40%, rgba(229, 223, 216, 0) 55%);
+  background: linear-gradient(90deg, #e5dfd8 20%, rgba(229, 223, 216, 0.6) 35%, rgba(229, 223, 216, 0) 50%);
   z-index: 2;
 }
 
