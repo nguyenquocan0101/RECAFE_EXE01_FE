@@ -19,23 +19,10 @@ const EnvironmentalImpact: React.FC = () => {
     const { t, language } = useLanguage()
     const [viewMode, setViewMode] = useState<'map' | 'list'>('map')
     const [searchQuery, setSearchQuery] = useState('')
-    const [activePartnerId, setActivePartnerId] = useState(1)
+    const [activePartnerId, setActivePartnerId] = useState(2)
     const [isMuted, setIsMuted] = useState(true)
 
     const partners: Partner[] = [
-        {
-            id: 1,
-            name: 'Passio Coffee',
-            addressVI: 'Lô T2-4, Đường D1, Khu Công Nghệ Cao, P. Tân Phú, TP. Thủ Đức, TP. HCM',
-            addressEN: 'Lot T2-4, D1 Road, High-Tech Park, Tan Phu Ward, Thu Duc City, HCMC',
-            donatedVI: '1.200kg đã đóng góp',
-            donatedEN: '1,200kg donated',
-            mapUrl: 'https://www.google.com/maps/place/Passio+Coffee/@10.8416878,106.8067476,17z/data=!3m1!4b1!4m6!3m5!1s0x3175276d9724ca93:0xdd707f9d67a751dd!8m2!3d10.8416878!4d106.8093225!16s%2Fg%2F11k0szmxkw?entry=ttu&g_ep=EgoyMDI2MDYxMy4wIKXMDSoASAFQAw%3D%3D',
-            lat: 10.8416878,
-            lng: 106.8093225,
-            x: 52,
-            y: 72
-        },
         {
             id: 2,
             name: 'Deer Coffee - Nhà Văn Hóa Sinh Viên',
