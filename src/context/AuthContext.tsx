@@ -78,6 +78,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem('token');
         setToken(null);
         setUser(null);
+        window.location.href = '/';
     };
 
     const login = async (usernameOrEmail: string, password: string) => {
