@@ -299,7 +299,7 @@ input, button, select, textarea {
   min-height: 80vh;
   display: flex;
   align-items: center;
-  background-color: #e5dfd8;
+  background-color: rgba(229, 223, 216, 0.3);
   overflow: hidden;
 }
 
@@ -310,7 +310,6 @@ input, button, select, textarea {
   width: 55%;
   height: 100%;
   z-index: 1;
-  opacity: 0.3;
 }
 
 .hero-bg-image {
@@ -326,7 +325,7 @@ input, button, select, textarea {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #e5dfd8 35%, rgba(229, 223, 216, 0.8) 55%, rgba(229, 223, 216, 0) 80%);
+  background: linear-gradient(90deg, rgba(229, 223, 216, 0.3) 35%, rgba(229, 223, 216, 0.24) 55%, rgba(229, 223, 216, 0) 80%);
   z-index: 2;
 }
 
