@@ -29,13 +29,13 @@ const Checkout: React.FC = () => {
     const [voucherErrorMsg, setVoucherErrorMsg] = useState('')
     
     // Address fields
-    const [firstName, setFirstName] = useState('An')
-    const [lastName, setLastName] = useState('Nguyen Quoc')
-    const [streetAddress, setStreetAddress] = useState('Le Van Viet')
-    const [phone, setPhone] = useState('0359261605')
-    const [province, setProvince] = useState('Ho Chi Minh')
-    const [district, setDistrict] = useState('Quan 9')
-    const [ward, setWard] = useState('Tan Phu')
+    const [firstName, setFirstName] = useState('')
+    const [lastName, setLastName] = useState('')
+    const [streetAddress, setStreetAddress] = useState('')
+    const [phone, setPhone] = useState('')
+    const [province, setProvince] = useState('')
+    const [district, setDistrict] = useState('')
+    const [ward, setWard] = useState('')
     const [submitting, setSubmitting] = useState(false)
 
     // Payment state variables
