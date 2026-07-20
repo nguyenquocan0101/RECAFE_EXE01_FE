@@ -79,8 +79,11 @@ export const previewCoupon = async (data: CouponPreviewRequest): Promise<CouponP
 
     const json = await response.json().catch(() => null);
 
-    if (!response.ok || json?.success === false) {
-        throw new Error(json?.message || `Coupon preview failed: ${response.status}`);
+    const isSuccess = json?.success ?? json?.Success;
+    const message = json?.message ?? json?.Message;
+
+    if (!response.ok || isSuccess === false) {
+        throw new Error(message || `Coupon preview failed: ${response.status}`);
     }
 
     // Unwrap ApiResponse<T> wrapper
