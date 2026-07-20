@@ -95,6 +95,14 @@ input, button, select, textarea {
   font-family: inherit;
 }
 
+/* Native button reset: component classes remain responsible for intentional borders. */
+button {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: inherit;
+}
+
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;

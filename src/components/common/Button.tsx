@@ -32,7 +32,7 @@ export const Button: React.FC<ButtonProps> = ({
     return (
         <button
             onClick={onClick}
-            className={`flex min-h-[44px] items-center justify-center gap-2 rounded px-5 py-2.5 text-sm font-semibold transition-all hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#657b35] ${variantClasses} ${className}`}
+            className={`flex min-h-[44px] items-center justify-center gap-2 rounded px-5 py-2.5 text-sm font-semibold transition-all hover:scale-[1.02] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#657b35] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100 ${variantClasses} ${className}`}
             style={{ boxShadow: 'none' }}
             {...props}
         >
