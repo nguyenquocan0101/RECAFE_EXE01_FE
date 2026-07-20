@@ -96,3 +96,7 @@ dist-ssr/
 FE_3D_CUSTOMIZATION_MVP.md
 FE_VOUCHER_PRODUCT_SCOPE_FLOW.md
 latest_swagger.json
+.agent/
+.agents/
+.codegraph/
+.codex/
