@@ -4,6 +4,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import ProductInfoCard from '@/components/product/ProductInfoCard'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
+import ProductReviews from '@/components/reviews/ProductReviews'
 
 const Model3DViewer = lazy(() => import('@/components/product/Model3DViewer'))
 
@@ -351,14 +352,16 @@ const ProductDetail: React.FC = () => {
                 </div>
 
                 {/* Right side: Product info card */}
-                <ProductInfoCard 
-                    dbProduct={dbProduct}
+            <ProductInfoCard
+                dbProduct={dbProduct}
                     quantity={quantity}
                     setQuantity={setQuantity}
                     handleAddToCart={handleAddToCart}
                     handleBuyNow={handleBuyNow}
                 />
             </div>
+
+            <ProductReviews productId={dbProduct.id} />
 
             {/* Visual story section */}
             <section className="detail-story-section">

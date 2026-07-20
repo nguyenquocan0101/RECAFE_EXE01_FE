@@ -34,6 +34,65 @@ export const updateOrderStatus = (id: string, status: string) =>
         body: JSON.stringify({ status })
     }).then(handleResponse);
 
+// ─── Review moderation ────────────────────────────────────────────────────
+
+export interface AdminReviewMedia {
+    id: string;
+    url: string;
+    mediaType: string;
+}
+
+export interface AdminReview {
+    id: string;
+    userId: string;
+    productId: string;
+    orderId: string;
+    productName: string;
+    reviewerName: string;
+    rating: number;
+    comment?: string | null;
+    isVisible: boolean;
+    isVerifiedPurchase: boolean;
+    createdAt: string;
+    media: AdminReviewMedia[];
+}
+
+export interface AdminReviewPage {
+    page: number;
+    pageSize: number;
+    totalReviews: number;
+    totalPages: number;
+    reviews: AdminReview[];
+}
+
+export interface AdminReviewQuery {
+    page?: number;
+    pageSize?: number;
+    isVisible?: boolean;
+    productKeyword?: string;
+    rating?: number;
+}
+
+export const getAdminReviews = (params: AdminReviewQuery = {}) => {
+    const query = new URLSearchParams();
+    query.set('page', String(params.page || 1));
+    query.set('pageSize', String(params.pageSize || 10));
+    if (params.isVisible !== undefined) query.set('isVisible', String(params.isVisible));
+    if (params.productKeyword?.trim()) query.set('productKeyword', params.productKeyword.trim());
+    if (params.rating) query.set('rating', String(params.rating));
+
+    return fetch(`${apiUrl}api/admin/reviews?${query.toString()}`, {
+        headers: { 'Content-Type': 'application/json', ...authHeader() }
+    }).then(handleResponse);
+};
+
+export const setReviewVisibility = (id: string, isVisible: boolean) =>
+    fetch(`${apiUrl}api/admin/reviews/${id}/visibility`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        body: JSON.stringify({ isVisible })
+    }).then(handleResponse);
+
 // ─── Categories ────────────────────────────────────────────────────────────
 
 export const getAdminCategories = () =>

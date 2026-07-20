@@ -7,6 +7,14 @@ import { getMyOrders, getOrderById } from '@/services/api/orders'
 import { getAddresses } from '@/services/api/addresses'
 import { EditProfileModal } from '@/components/profile/EditProfileModal'
 import SepayPaymentModal from '@/components/common/SepayPaymentModal'
+import ReviewModal from '@/components/reviews/ReviewModal'
+
+interface ReviewTarget {
+    orderId: string
+    productId: string
+    productName: string
+    reviewId?: string | null
+}
 
 const Profile: React.FC = () => {
     const { language } = useLanguage()
@@ -21,6 +29,7 @@ const Profile: React.FC = () => {
 
     // Modal Control
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+    const [reviewTarget, setReviewTarget] = useState<ReviewTarget | null>(null)
 
     // Sepay Payment Modal Control
     const [selectedOrderForPayment, setSelectedOrderForPayment] = useState<any | null>(null)
@@ -32,6 +41,15 @@ const Profile: React.FC = () => {
         setSelectedOrderForPayment(order)
         setPaymentSuccess(false)
         setIsPaymentModalOpen(true)
+    }
+
+    const openReview = (order: any, item: any) => {
+        setReviewTarget({
+            orderId: order.id,
+            productId: item.productId,
+            productName: item.productName,
+            reviewId: item.reviewId || null
+        })
     }
 
     const handleSimulateWebhook = async () => {
@@ -266,9 +284,18 @@ const Profile: React.FC = () => {
                                                 <tr key={order.id} className="hover:bg-[#faf9f6]/40 transition-colors">
                                                     <td className="py-4 pr-4 font-medium text-[#9c7a65]">{dateDisplay}</td>
                                                     <td className="py-4 px-4 font-mono font-bold text-xs text-[#4b2311]">#{codeDisplay}</td>
-                                                    <td className="py-4 px-4 font-medium max-w-[200px] truncate">
+                                                    <td className="py-4 px-4 font-medium min-w-[220px]">
                                                         {order.orderItems && order.orderItems.length > 0
-                                                            ? order.orderItems.map((item: any) => `${item.productName} (x${item.quantity})`).join(', ')
+                                                            ? <div className="space-y-2">
+                                                                {order.orderItems
+                                                                    .filter((item: any, index: number, items: any[]) => items.findIndex(candidate => candidate.productId === item.productId) === index)
+                                                                    .map((item: any) => <div key={item.productId} className="flex items-center justify-between gap-3">
+                                                                        <span className="min-w-0 truncate" title={item.productName}>{item.productName} <span className="text-xs text-[#9c7a65]">(x{item.quantity})</span></span>
+                                                                        {order.status === 'Completed' && <button type="button" onClick={() => openReview(order, item)} className="min-h-[44px] shrink-0 rounded border border-[#657b35] px-3 text-xs font-bold text-[#657b35] transition-colors hover:bg-[#657b35] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#657b35]">
+                                                                            {item.reviewId ? (language === 'vi' ? 'Đã đánh giá' : 'Reviewed') : (language === 'vi' ? 'Đánh giá' : 'Review')}
+                                                                        </button>}
+                                                                    </div>)}
+                                                              </div>
                                                             : '—'}
                                                     </td>
                                                     <td className="py-4 px-4 font-extrabold text-right text-[#657b35]">
@@ -372,6 +399,17 @@ const Profile: React.FC = () => {
                 paymentSuccess={paymentSuccess}
                 onSimulateWebhook={handleSimulateWebhook}
             />
+
+            {reviewTarget && <ReviewModal
+                isOpen={Boolean(reviewTarget)}
+                onClose={() => setReviewTarget(null)}
+                orderId={reviewTarget.orderId}
+                productId={reviewTarget.productId}
+                productName={reviewTarget.productName}
+                existingReviewId={reviewTarget.reviewId}
+                onSubmitted={() => fetchOrders()}
+                onDeleted={() => fetchOrders()}
+            />}
         </div>
     )
 }

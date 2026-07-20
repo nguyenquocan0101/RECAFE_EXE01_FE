@@ -87,9 +87,10 @@ const AdminDashboard: React.FC = () => {
             {/* Quick Actions Row */}
             <div className="mb-10">
                 <h2 className="text-xs font-bold text-[#68361c]/50 uppercase tracking-widest mb-4">Lối tắt thao tác nhanh</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                     {[
                         { to: '/admin/orders', label: 'Xem đơn hàng', desc: 'Kiểm tra, cập nhật trạng thái đơn hàng & in hóa đơn', actionText: 'Quản lý đơn hàng', color: 'border-l-[#657b35] hover:border-l-4' },
+                        { to: '/admin/reviews', label: 'Kiểm duyệt đánh giá', desc: 'Xem phản hồi khách hàng và ẩn nội dung không phù hợp', actionText: 'Quản lý đánh giá', color: 'border-l-[#925f3c] hover:border-l-4' },
                         { to: '/admin/products', label: 'Quản lý kho hàng', desc: 'Thêm mới, cập nhật giá, tồn kho & cá nhân hoá sản phẩm', actionText: 'Vào kho sản phẩm', color: 'border-l-[#925f3c] hover:border-l-4' },
                         { to: '/admin/categories', label: 'Tổ chức danh mục', desc: 'Cấu hình đường dẫn slug & nhóm các sản phẩm đặc trưng', actionText: 'Chỉnh sửa danh mục', color: 'border-l-[#68361c] hover:border-l-4' },
                     ].map((action) => (
