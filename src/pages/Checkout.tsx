@@ -4,7 +4,7 @@ import { useCart } from '@/context/CartContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useToast } from '@/context/ToastContext'
 import { checkoutOrder, simulateSepayWebhook, getOrderById } from '@/services/api/orders'
-import { previewCoupon, type CouponPreviewResponse } from '@/services/api/coupons'
+import { getCouponErrorMessage, previewCoupon, type CouponPreviewResponse } from '@/services/api/coupons'
 import SepayPaymentModal from '@/components/common/SepayPaymentModal'
 
 const Checkout: React.FC = () => {
@@ -111,7 +111,10 @@ const Checkout: React.FC = () => {
         } catch (err: any) {
             setVoucherPreview(null);
             setVoucherStatus('invalid');
-            setVoucherErrorMsg(err.message || (language === 'vi' ? 'Mã giảm giá không hợp lệ' : 'Invalid coupon code'));
+            setVoucherErrorMsg(getCouponErrorMessage(
+                err.message || (language === 'vi' ? 'Mã giảm giá không hợp lệ' : 'Invalid coupon code'),
+                language
+            ));
         }
     };
 
