@@ -4,6 +4,7 @@ interface ImportMetaEnv {
     readonly VITE_APP_TITLE: string
     readonly VITE_DEFAULT_LANG: string
     readonly VITE_API_URL: string
+    readonly VITE_SEPAY_DEV_API_KEY?: string
 }
 
 interface ImportMeta {

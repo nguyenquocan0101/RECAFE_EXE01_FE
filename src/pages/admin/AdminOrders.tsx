@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import * as adminApi from '@/services/api/admin';
 import { Modal } from '@/components/common/Modal';
 import { Button } from '@/components/common/Button';
+import { useAuth } from '@/context/AuthContext';
 
 const ORDER_STATUSES = ['Pending', 'Confirmed', 'Preparing', 'Shipping', 'Completed', 'Cancelled', 'Returned'];
 
@@ -36,6 +38,9 @@ const statusLabelVi: Record<string, string> = {
 };
 
 const AdminOrders: React.FC = () => {
+    const { isAdmin } = useAuth();
+    const [searchParams] = useSearchParams();
+    const linkedOrderId = searchParams.get('orderId');
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState<string | null>(null);
@@ -68,6 +73,25 @@ const AdminOrders: React.FC = () => {
         window.addEventListener('click', handleOutsideClick);
         return () => window.removeEventListener('click', handleOutsideClick);
     }, []);
+
+    useEffect(() => {
+        if (!linkedOrderId) return;
+
+        let isActive = true;
+        const loadLinkedOrder = async () => {
+            try {
+                const response = await adminApi.getAdminOrderById(linkedOrderId);
+                if (isActive) setSelectedOrder(response?.data || response);
+            } catch (err: any) {
+                if (isActive) setError(err.message || 'Không thể tải đơn hàng liên quan.');
+            }
+        };
+
+        loadLinkedOrder();
+        return () => {
+            isActive = false;
+        };
+    }, [linkedOrderId]);
 
 
     const handleStatusChange = async (orderId: string, status: string) => {
@@ -311,7 +335,7 @@ const AdminOrders: React.FC = () => {
                                                                 </svg>
                                                                 Xem chi tiết
                                                             </button>
-                                                            {ALLOWED_TRANSITIONS[order.status]?.map(status => (
+                                                            {isAdmin && ALLOWED_TRANSITIONS[order.status]?.map(status => (
                                                                 <button
                                                                     key={status}
                                                                     onClick={() => { handleStatusChange(order.id, status); setActiveMenuId(null); }}
@@ -407,7 +431,7 @@ const AdminOrders: React.FC = () => {
                             <div className="flex items-center gap-4">
                                 {/* Inline Status modification */}
                                 <div className="flex items-center gap-2">
-                                    {ALLOWED_TRANSITIONS[selectedOrder.status]?.length > 0 ? (
+                                    {isAdmin && ALLOWED_TRANSITIONS[selectedOrder.status]?.length > 0 ? (
                                         <select
                                             value={selectedOrder.status}
                                             onChange={(e) => handleStatusChange(selectedOrder.id, e.target.value)}

@@ -77,16 +77,28 @@ export const checkoutOrder = async (data: CheckoutOrderPayload) => {
 };
 
 export const simulateSepayWebhook = async (data: SepayWebhookPayload) => {
+    if (!import.meta.env.DEV) {
+        throw new Error('Sepay simulation is available only in development builds');
+    }
+
+    const devApiKey = import.meta.env.VITE_SEPAY_DEV_API_KEY;
+    if (!devApiKey) {
+        throw new Error('VITE_SEPAY_DEV_API_KEY is not configured');
+    }
+
     const response = await fetch(`${apiUrl}api/sepay-webhook`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Apikey sandbox_sepay_api_key_123456'
+            'Authorization': `Apikey ${devApiKey}`
         },
         body: JSON.stringify(data)
     });
     return handleResponse(response);
 };
+
+export const isSepaySimulatorConfigurationError = (error: unknown) =>
+    error instanceof Error && error.message.includes('VITE_SEPAY_DEV_API_KEY');
 
 export const getMyOrders = async () => {
     const response = await fetch(`${apiUrl}api/orders/my-orders`, {

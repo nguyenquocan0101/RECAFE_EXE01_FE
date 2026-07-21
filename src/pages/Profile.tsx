@@ -3,7 +3,7 @@ import { useLanguage } from '@/context/LanguageContext'
 import { useAuth } from '@/context/AuthContext'
 import { useToast } from '@/context/ToastContext'
 import { Button } from '@/components/common/Button'
-import { getMyOrders, getOrderById } from '@/services/api/orders'
+import { getMyOrders, getOrderById, simulateSepayWebhook, isSepaySimulatorConfigurationError } from '@/services/api/orders'
 import { getAddresses } from '@/services/api/addresses'
 import { EditProfileModal } from '@/components/profile/EditProfileModal'
 import SepayPaymentModal from '@/components/common/SepayPaymentModal'
@@ -53,10 +53,9 @@ const Profile: React.FC = () => {
     }
 
     const handleSimulateWebhook = async () => {
-        if (!selectedOrderForPayment) return;
+        if (!import.meta.env.DEV || !selectedOrderForPayment) return;
         setSimulating(true);
         try {
-            const { simulateSepayWebhook } = await import('@/services/api/orders');
             await simulateSepayWebhook({
                 id: Math.floor(Math.random() * 100000000),
                 gateway: 'VietinBank',
@@ -75,6 +74,16 @@ const Profile: React.FC = () => {
                 setIsPaymentModalOpen(false);
             }, 2500);
         } catch (err: any) {
+            if (isSepaySimulatorConfigurationError(err)) {
+                showToast(
+                    language === 'vi'
+                        ? 'Thiếu VITE_SEPAY_DEV_API_KEY. Hãy cấu hình khóa test trước khi giả lập thanh toán.'
+                        : 'VITE_SEPAY_DEV_API_KEY is missing. Configure the test key before simulating payment.',
+                    'error'
+                );
+                return;
+            }
+
             console.warn("Backend webhook API returned error, proceeding with client-side success:", err);
             setPaymentSuccess(true);
             showToast(

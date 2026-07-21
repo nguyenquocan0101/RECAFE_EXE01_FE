@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useCart } from '@/context/CartContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useToast } from '@/context/ToastContext'
-import { checkoutOrder, simulateSepayWebhook, getOrderById } from '@/services/api/orders'
+import { checkoutOrder, simulateSepayWebhook, getOrderById, isSepaySimulatorConfigurationError } from '@/services/api/orders'
 import { getCouponErrorMessage, previewCoupon, type CouponPreviewResponse } from '@/services/api/coupons'
 import SepayPaymentModal from '@/components/common/SepayPaymentModal'
 
@@ -224,7 +224,7 @@ setSubmitting(true);
     };
 
     const handleSimulateWebhook = async () => {
-        if (!createdOrder) return;
+        if (!import.meta.env.DEV || !createdOrder) return;
         setSimulating(true);
         
         const webhookPayload = {
@@ -250,6 +250,16 @@ setSubmitting(true);
                 navigate('/profile');
             }, 2500);
         } catch (err: any) {
+            if (isSepaySimulatorConfigurationError(err)) {
+                showToast(
+                    language === 'vi'
+                        ? 'Thiếu VITE_SEPAY_DEV_API_KEY. Hãy cấu hình khóa test trước khi giả lập thanh toán.'
+                        : 'VITE_SEPAY_DEV_API_KEY is missing. Configure the test key before simulating payment.',
+                    'error'
+                );
+                return;
+            }
+
             console.warn("Backend webhook API returned error, proceeding with rich client-side simulation:", err);
             
             setPaymentSuccess(true);

@@ -11,6 +11,7 @@ import Checkout from '@/pages/Checkout'
 import Profile from '@/pages/Profile'
 import AdminDashboard from '@/pages/admin/AdminDashboard'
 import AdminOrders from '@/pages/admin/AdminOrders'
+import AdminPayments from '@/pages/admin/AdminPayments'
 import AdminProducts from '@/pages/admin/AdminProducts'
 import AdminCategories from '@/pages/admin/AdminCategories'
 import AdminUsers from '@/pages/admin/AdminUsers'
@@ -91,6 +92,7 @@ export default function App() {
                             </ProtectedRoute>
                         } />
                         <Route path="orders" element={<AdminOrders />} />
+                        <Route path="payments" element={<AdminPayments />} />
                         <Route path="reviews" element={
                             <ProtectedRoute allowedRoles={['Admin']}>
                                 <AdminReviews />

@@ -73,6 +73,15 @@ const AdminLayout: React.FC = () => {
                         {sidebarOpen && <span>Đơn hàng</span>}
                     </NavLink>
 
+                    <NavLink to="/admin/payments" className={navLink}>
+                        <svg width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="shrink-0">
+                            <rect x="2.5" y="5" width="19" height="14" rx="2" />
+                            <line x1="2.5" y1="10" x2="21.5" y2="10" />
+                            <line x1="7" y1="15" x2="10" y2="15" />
+                        </svg>
+                        {sidebarOpen && <span>Thanh toán</span>}
+                    </NavLink>
+
                     {isAdmin && (
                         <NavLink to="/admin/reviews" className={navLink}>
                             <svg width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="shrink-0">
