@@ -104,7 +104,7 @@ const Profile: React.FC = () => {
     useEffect(() => {
         if (!isPaymentModalOpen || !selectedOrderForPayment?.id || paymentSuccess) return;
 
-        let intervalId: NodeJS.Timeout;
+        let intervalId: ReturnType<typeof window.setInterval>;
 
         const checkPaymentStatus = async () => {
             try {

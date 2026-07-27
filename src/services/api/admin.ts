@@ -219,6 +219,57 @@ export const getAdminUsers = (params?: { role?: number; isActive?: boolean; keyw
     }).then(handleResponse);
 };
 
+export interface AdminCustomerExportFile {
+    blob: Blob;
+    fileName: string;
+}
+
+export class AdminCustomerExportError extends Error {
+    status: number;
+
+    constructor(message: string, status: number) {
+        super(message);
+        this.name = 'AdminCustomerExportError';
+        this.status = status;
+    }
+}
+
+const getCustomerExportFileName = (contentDisposition: string | null) => {
+    const encodedName = contentDisposition?.match(/filename\*=UTF-8''([^;]+)/i)?.[1];
+    if (encodedName) {
+        try {
+            return decodeURIComponent(encodedName);
+        } catch {
+            // Fall through to the regular filename or safe default.
+        }
+    }
+
+    return contentDisposition?.match(/filename="?([^";]+)"?/i)?.[1]
+        || `customers-${new Date().toISOString().slice(0, 10)}.csv`;
+};
+
+export const exportAdminCustomers = async (): Promise<AdminCustomerExportFile> => {
+    const response = await fetch(`${apiUrl}api/admin/users/export`, {
+        headers: { ...authHeader() }
+    });
+
+    if (!response.ok) {
+        const payload = await response.json().catch(() => null);
+        const fallback = response.status === 403
+            ? 'Bạn không có quyền xuất dữ liệu khách hàng.'
+            : response.status === 401
+                ? 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'
+                : 'Không thể xuất CSV khách hàng. Vui lòng thử lại.';
+
+        throw new AdminCustomerExportError(payload?.message || fallback, response.status);
+    }
+
+    return {
+        blob: await response.blob(),
+        fileName: getCustomerExportFileName(response.headers.get('Content-Disposition'))
+    };
+};
+
 export const getAdminUserById = (id: string) =>
     fetch(`${apiUrl}api/admin/users/${id}`, {
         headers: { 'Content-Type': 'application/json', ...authHeader() }

@@ -2,9 +2,9 @@ import React, { useState, useEffect, useMemo, Suspense } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, Stage, Decal, Html, useGLTF } from '@react-three/drei'
 import * as THREE from 'three'
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import { ThreeMFLoader } from 'three/examples/jsm/loaders/3MFLoader'
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import { ThreeMFLoader } from 'three/examples/jsm/loaders/3MFLoader.js'
 
 // ─── 3D Model Renderers to avoid conditional hooks ───────────────────────────
 
@@ -95,8 +95,8 @@ const StlModelRenderer: React.FC<RendererProps> = ({
         const g = loadedGeom.clone();
         g.center();
         g.computeVertexNormals();
+        g.computeBoundingBox();
         const box = g.boundingBox || new THREE.Box3();
-        if (!g.boundingBox) box.setFromBufferAttribute(g.attributes.position);
         const size = new THREE.Vector3();
         box.getSize(size);
         const maxDim = Math.max(size.x, size.y, size.z);

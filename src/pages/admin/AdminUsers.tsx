@@ -23,6 +23,8 @@ const AdminUsers: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [saving, setSaving] = useState<string | null>(null);
+    const [exporting, setExporting] = useState(false);
+    const [exportFeedback, setExportFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
     // Search & Filter
     const [searchQuery, setSearchQuery] = useState('');
@@ -56,6 +58,34 @@ const AdminUsers: React.FC = () => {
     };
 
     useEffect(() => { loadUsers(); }, []);
+
+    const handleExportCustomers = async () => {
+        setExporting(true);
+        setExportFeedback(null);
+        let downloadUrl: string | null = null;
+
+        try {
+            const exportedFile = await adminApi.exportAdminCustomers();
+            downloadUrl = URL.createObjectURL(exportedFile.blob);
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = exportedFile.fileName;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setExportFeedback({ type: 'success', message: `Đã tải tệp ${exportedFile.fileName}.` });
+        } catch (err: unknown) {
+            setExportFeedback({
+                type: 'error',
+                message: err instanceof Error ? err.message : 'Không thể xuất CSV khách hàng. Vui lòng thử lại.'
+            });
+        } finally {
+            if (downloadUrl) {
+                URL.revokeObjectURL(downloadUrl);
+            }
+            setExporting(false);
+        }
+    };
 
     // Reset page on filter change
     useEffect(() => { setCurrentPage(1); }, [searchQuery, filterRole, filterActive]);
@@ -160,15 +190,31 @@ const AdminUsers: React.FC = () => {
                         Xem, chỉnh sửa thông tin và quyền hạn của tất cả tài khoản trong hệ thống.
                     </p>
                 </div>
-                <button
-                    onClick={loadUsers}
-                    className="flex items-center gap-2 px-4 py-2 bg-white border border-[#e8ddd5] rounded text-[#4b2311] text-xs font-semibold hover:bg-[#FAF6F0] shadow-sm transition-all cursor-pointer"
-                >
-                    <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
-                        <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-                    </svg>
-                    Làm mới danh sách
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleExportCustomers}
+                        disabled={exporting}
+                        className="flex items-center gap-2 px-4 py-2 bg-[#657b35] border border-[#657b35] rounded text-white text-xs font-semibold hover:bg-[#4b5e26] shadow-sm transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                        {exporting ? (
+                            <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        ) : (
+                            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                <path d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14" />
+                            </svg>
+                        )}
+                        {exporting ? 'Đang xuất CSV…' : 'Xuất khách hàng'}
+                    </button>
+                    <button
+                        onClick={loadUsers}
+                        className="flex items-center gap-2 px-4 py-2 bg-white border border-[#e8ddd5] rounded text-[#4b2311] text-xs font-semibold hover:bg-[#FAF6F0] shadow-sm transition-all cursor-pointer"
+                    >
+                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                            <path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+                        </svg>
+                        Làm mới danh sách
+                    </button>
+                </div>
             </div>
 
             {/* Statistics Cards */}
@@ -244,6 +290,18 @@ const AdminUsers: React.FC = () => {
 
             {error && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded text-red-700 text-sm">{error}</div>
+            )}
+            {exportFeedback && (
+                <div
+                    role="status"
+                    aria-live="polite"
+                    className={`mb-6 p-4 rounded text-sm ${exportFeedback.type === 'success'
+                        ? 'bg-green-50 border border-green-200 text-green-700'
+                        : 'bg-red-50 border border-red-200 text-red-700'
+                    }`}
+                >
+                    {exportFeedback.message}
+                </div>
             )}
 
             {/* Main Table Card */}

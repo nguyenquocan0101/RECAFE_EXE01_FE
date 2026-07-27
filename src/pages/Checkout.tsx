@@ -48,7 +48,7 @@ const Checkout: React.FC = () => {
     useEffect(() => {
         if (!isPaymentModalOpen || !createdOrder?.id || paymentSuccess) return;
 
-        let intervalId: NodeJS.Timeout;
+        let intervalId: ReturnType<typeof window.setInterval>;
 
         const checkPaymentStatus = async () => {
             try {

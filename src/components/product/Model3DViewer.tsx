@@ -2,9 +2,9 @@ import React, { Suspense, useRef, useState, useCallback } from 'react'
 import { Canvas, useLoader } from '@react-three/fiber'
 import { OrbitControls, Stage, useGLTF, Html, useProgress } from '@react-three/drei'
 import * as THREE from 'three'
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
-import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
-import { ThreeMFLoader } from 'three/examples/jsm/loaders/3MFLoader'
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader.js'
+import { ThreeMFLoader } from 'three/examples/jsm/loaders/3MFLoader.js'
 
 // ─── Loading overlay ────────────────────────────────────────────────────────
 
