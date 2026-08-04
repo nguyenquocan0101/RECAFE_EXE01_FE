@@ -23,6 +23,8 @@ import { useAuth } from '@/context/AuthContext'
 import { useCart } from '@/context/CartContext'
 import ReCafeLoader from '@/components/common/ReCafeLoader'
 import ScrollToTop from '@/components/common/ScrollToTop'
+import ProductStory from '@/pages/ProductStory'
+import AdminProductStories from '@/pages/admin/AdminProductStories'
 
 export default function App() {
     const { isLoginModalOpen, closeLoginModal, loginReason, isLoading: isAuthLoading, isAuthenticated } = useAuth();
@@ -98,6 +100,7 @@ export default function App() {
                                 <AdminReviews />
                             </ProtectedRoute>
                         } />
+                        <Route path="/:storySlug" element={<ProductStory />} />
                         <Route path="products" element={
                             <ProtectedRoute allowedRoles={['Admin']}>
                                 <AdminProducts />
@@ -116,6 +119,11 @@ export default function App() {
                         <Route path="coupons" element={
                             <ProtectedRoute allowedRoles={['Admin']}>
                                 <AdminCoupons />
+                            </ProtectedRoute>
+                        } />
+                        <Route path="product-stories" element={
+                            <ProtectedRoute allowedRoles={['Admin']}>
+                                <AdminProductStories />
                             </ProtectedRoute>
                         } />
                     </Route>

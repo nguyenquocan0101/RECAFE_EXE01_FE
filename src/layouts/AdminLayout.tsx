@@ -110,6 +110,14 @@ const AdminLayout: React.FC = () => {
                                 {sidebarOpen && <span>Danh mục</span>}
                             </NavLink>
 
+                            <NavLink to="/admin/product-stories" className={navLink}>
+                                <svg width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="shrink-0">
+                                    <path d="M4 4h16v16H4z" />
+                                    <path d="M8 8h3v3H8zM13 8h3v3h-3zM8 13h3v3H8zM13 13h3v3h-3z" />
+                                </svg>
+                                {sidebarOpen && <span>QR & truy xuất</span>}
+                            </NavLink>
+
                             <NavLink to="/admin/users" className={navLink}>
                                 <svg width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" className="shrink-0">
                                     <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />

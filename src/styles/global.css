@@ -3151,3 +3151,61 @@ input:-webkit-autofill:active {
   display: block;
 }
 
+/* Public traceability HTML is constrained to the story surface, never the app shell. */
+.story-rich-content {
+  color: var(--text-muted);
+  font-size: 1rem;
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+}
+
+.story-rich-content h1,
+.story-rich-content h2,
+.story-rich-content h3,
+.story-rich-content h4 {
+  color: var(--text-dark);
+  font-weight: 800;
+  line-height: 1.25;
+  margin: 1.75rem 0 0.75rem;
+}
+
+.story-rich-content h1:first-child,
+.story-rich-content h2:first-child,
+.story-rich-content h3:first-child,
+.story-rich-content h4:first-child,
+.story-rich-content p:first-child {
+  margin-top: 0;
+}
+
+.story-rich-content h1 { font-size: 2rem; }
+.story-rich-content h2 { font-size: 1.6rem; }
+.story-rich-content h3 { font-size: 1.25rem; }
+.story-rich-content h4 { font-size: 1.05rem; }
+.story-rich-content p { margin: 0.9rem 0; }
+.story-rich-content strong { color: var(--text-dark); font-weight: 800; }
+.story-rich-content em { color: var(--primary); }
+.story-rich-content ul,
+.story-rich-content ol { margin: 1rem 0; padding-left: 1.5rem; }
+.story-rich-content li { margin: 0.35rem 0; }
+.story-rich-content blockquote {
+  border-left: 3px solid var(--primary);
+  color: var(--text-dark);
+  font-size: 1.08rem;
+  font-weight: 500;
+  margin: 1.5rem 0;
+  padding-left: 1rem;
+}
+.story-rich-content a {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.story-rich-content hr { border: 0; border-top: 1px solid #e8ddd5; margin: 2rem 0; }
+
+@media (max-width: 640px) {
+  .story-rich-content { font-size: 0.95rem; }
+  .story-rich-content h1 { font-size: 1.65rem; }
+  .story-rich-content h2 { font-size: 1.4rem; }
+}
+
