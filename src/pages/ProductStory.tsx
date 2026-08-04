@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useLanguage } from '@/context/LanguageContext';
-import { ApiRequestError, getProductStory } from '@/services/api/productStories';
+import { ApiRequestError, getProductStory, registerProductStoryOpen } from '@/services/api/productStories';
 
 const ProductStory: React.FC = () => {
     const { t, language } = useLanguage();
     const { storySlug } = useParams<{ storySlug: string }>();
     const [story, setStory] = useState<Awaited<ReturnType<typeof getProductStory>> | null>(null);
     const [state, setState] = useState<'loading' | 'success' | 'not-found' | 'error'>('loading');
+    const trackedSlug = useRef<string | null>(null);
 
     useEffect(() => {
         if (!storySlug) return;
@@ -27,6 +28,12 @@ const ProductStory: React.FC = () => {
 
         return () => controller.abort();
     }, [storySlug]);
+
+    useEffect(() => {
+        if (state !== 'success' || !story || trackedSlug.current === story.slug) return;
+        trackedSlug.current = story.slug;
+        void registerProductStoryOpen(story.slug).catch(() => undefined);
+    }, [state, story]);
 
     if (state === 'loading') {
         return <div className="flex min-h-[70vh] items-center justify-center bg-[#f7f4f0]"><div className="h-9 w-9 animate-spin rounded-full border-2 border-[#657b35] border-t-transparent" /></div>;

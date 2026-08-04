@@ -7,6 +7,7 @@ import { useToast } from '@/context/ToastContext';
 import * as adminApi from '@/services/api/admin';
 import * as storyApi from '@/services/api/adminProductStories';
 import ProductStoryModal from './ProductStoryModal';
+import CoffeeTypeManager from './CoffeeTypeManager';
 
 interface ProductOption { id: string; name: string; slug: string; isActive?: boolean; }
 
@@ -175,6 +176,7 @@ const AdminProductStories: React.FC = () => {
             </div>
 
             <ProductStoryModal isOpen={modalOpen} onClose={() => setModalOpen(false)} story={editingStory} products={products} coffeeTypes={coffeeTypes} onSaved={handleSaved} />
+            <CoffeeTypeManager onActiveTypesChanged={() => void loadOptions()} />
 
             <Modal isOpen={Boolean(previewStory)} onClose={() => setPreviewStory(null)} closeOnOverlayClick>
                 {previewStory && <div className="my-8 h-[min(78vh,720px)] w-full max-w-4xl overflow-hidden rounded bg-white shadow-[0_20px_60px_rgba(75,35,17,0.18)]"><div className="flex items-center justify-between border-b border-[#e8ddd5] px-5 py-4"><div><p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#657b35]">{t('adminStory.draftPreview')}</p><p className="font-mono text-xs text-[#68361c]/70">/{previewStory.slug}</p></div><button type="button" onClick={() => setPreviewStory(null)} aria-label={t('adminStory.close')} className="grid h-10 w-10 place-items-center rounded text-xl text-[#925f3c] hover:bg-[#f7f4f0]">×</button></div><iframe title={t('adminStory.draftPreview')} sandbox="" className="h-[calc(100%-73px)] w-full border-0" srcDoc={`<!doctype html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>body{font-family:Arial,sans-serif;color:#4b2311;line-height:1.7;max-width:760px;margin:0 auto;padding:28px}a{color:#657b35}blockquote{border-left:3px solid #657b35;padding-left:12px}</style></head><body>${previewStory.contentHtmlVi}</body></html>`} /></div>}

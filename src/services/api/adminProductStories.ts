@@ -110,3 +110,35 @@ export const getActiveCoffeeTypes = async () => {
     const response = await fetch(`${apiUrl}api/admin/product-stories/coffee-types`, { headers: jsonHeaders() });
     return handleResponse<CoffeeTypeOption[]>(response);
 };
+
+export const getCoffeeTypes = async () => {
+    const response = await fetch(`${apiUrl}api/admin/coffee-types`, { headers: jsonHeaders() });
+    return handleResponse<CoffeeTypeOption[]>(response);
+};
+
+export const createCoffeeType = async (payload: Pick<CoffeeTypeOption, 'name' | 'slug' | 'displayOrder'>) => {
+    const response = await fetch(`${apiUrl}api/admin/coffee-types`, {
+        method: 'POST',
+        headers: jsonHeaders(),
+        body: JSON.stringify(payload),
+    });
+    return handleResponse<CoffeeTypeOption>(response);
+};
+
+export const updateCoffeeType = async (id: string, payload: Pick<CoffeeTypeOption, 'name' | 'slug' | 'displayOrder'>) => {
+    const response = await fetch(`${apiUrl}api/admin/coffee-types/${id}`, {
+        method: 'PUT',
+        headers: jsonHeaders(),
+        body: JSON.stringify(payload),
+    });
+    return handleResponse<CoffeeTypeOption>(response);
+};
+
+export const setCoffeeTypeActive = async (id: string, isActive: boolean) => {
+    const response = await fetch(`${apiUrl}api/admin/coffee-types/${id}/active`, {
+        method: 'PATCH',
+        headers: jsonHeaders(),
+        body: JSON.stringify({ isActive }),
+    });
+    return handleResponse<CoffeeTypeOption>(response);
+};

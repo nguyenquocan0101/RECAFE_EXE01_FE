@@ -33,3 +33,10 @@ const request = async (slug: string, signal?: AbortSignal): Promise<ProductStory
 };
 
 export const getProductStory = request;
+
+export const registerProductStoryOpen = async (slug: string): Promise<void> => {
+    const response = await fetch(`${apiUrl}api/product-stories/${encodeURIComponent(slug)}/open`, { method: 'POST' });
+    if (!response.ok) {
+        throw new ApiRequestError('Unable to register page open.', response.status);
+    }
+};

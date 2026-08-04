@@ -254,5 +254,17 @@
     "adminStory.unpublish": "Gỡ xuất bản",
     "adminStory.qrTitle": "Mã QR truy xuất",
     "adminStory.downloadQr": "Tải SVG",
-    "adminStory.draftPreview": "Xem trước bản nháp"
+    "adminStory.draftPreview": "Xem trước bản nháp",
+    "adminStory.catalogEyebrow": "CATALOG / COFFEE",
+    "adminStory.catalogTitle": "Danh mục loại cà phê",
+    "adminStory.catalogSubtitle": "Đổi tên và thứ tự hiển thị mà không đổi các URL đã tạo.",
+    "adminStory.catalogName": "Tên loại cà phê",
+    "adminStory.catalogSlug": "slug loại cà phê",
+    "adminStory.catalogOrder": "Thứ tự hiển thị",
+    "adminStory.catalogAdd": "Thêm loại",
+    "adminStory.catalogLoadError": "Không thể tải danh mục loại cà phê.",
+    "adminStory.catalogCreated": "Đã thêm loại cà phê.",
+    "adminStory.catalogUpdated": "Đã cập nhật loại cà phê.",
+    "adminStory.activeStatus": "Đang dùng",
+    "adminStory.inactiveStatus": "Đã tắt"
 }

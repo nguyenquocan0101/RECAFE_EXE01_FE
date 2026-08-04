@@ -7,7 +7,7 @@ import * as storyApi from '@/services/api/productStories';
 
 vi.mock('@/services/api/productStories', async () => {
     const actual = await vi.importActual<typeof import('@/services/api/productStories')>('@/services/api/productStories');
-    return { ...actual, getProductStory: vi.fn() };
+    return { ...actual, getProductStory: vi.fn(), registerProductStoryOpen: vi.fn().mockResolvedValue(undefined) };
 });
 
 const mockedGetProductStory = vi.mocked(storyApi.getProductStory);
@@ -41,6 +41,7 @@ describe('ProductStory', () => {
         expect(await screen.findByText('Lamp')).toBeInTheDocument();
         expect(screen.getByText('VI story')).toBeInTheDocument();
         expect(screen.getByRole('link', { name: 'Xem sản phẩm' })).toHaveAttribute('href', '/products/lamp');
+        expect(storyApi.registerProductStoryOpen).toHaveBeenCalledWith('arabica-and-lamp');
     });
 
     it('shows a not found state for an unavailable story', async () => {

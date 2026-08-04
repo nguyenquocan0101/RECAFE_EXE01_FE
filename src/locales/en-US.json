@@ -254,5 +254,17 @@
     "adminStory.unpublish": "Unpublish",
     "adminStory.qrTitle": "Traceability QR code",
     "adminStory.downloadQr": "Download SVG",
-    "adminStory.draftPreview": "Draft preview"
+    "adminStory.draftPreview": "Draft preview",
+    "adminStory.catalogEyebrow": "CATALOG / COFFEE",
+    "adminStory.catalogTitle": "Coffee type catalog",
+    "adminStory.catalogSubtitle": "Rename and reorder display values without changing existing URLs.",
+    "adminStory.catalogName": "Coffee type name",
+    "adminStory.catalogSlug": "coffee type slug",
+    "adminStory.catalogOrder": "Display order",
+    "adminStory.catalogAdd": "Add type",
+    "adminStory.catalogLoadError": "Could not load the coffee catalog.",
+    "adminStory.catalogCreated": "Coffee type added.",
+    "adminStory.catalogUpdated": "Coffee type updated.",
+    "adminStory.activeStatus": "Active",
+    "adminStory.inactiveStatus": "Inactive"
 }
