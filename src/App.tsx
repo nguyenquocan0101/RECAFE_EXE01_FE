@@ -77,6 +77,7 @@ export default function App() {
                                 <Profile />
                             </ProtectedRoute>
                         } />
+                        <Route path="/:storySlug" element={<ProductStory />} />
                     </Route>
 
                     {/* Admin / Staff routes */}
@@ -100,7 +101,6 @@ export default function App() {
                                 <AdminReviews />
                             </ProtectedRoute>
                         } />
-                        <Route path="/:storySlug" element={<ProductStory />} />
                         <Route path="products" element={
                             <ProtectedRoute allowedRoles={['Admin']}>
                                 <AdminProducts />
