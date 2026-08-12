@@ -32,6 +32,7 @@ interface DBProduct {
     usageNote?: string | null;
     isPersonalizable?: boolean;
     rewardPoints?: number;
+    viewCount: number;
     category?: ProductCategory | null;
     images?: ProductImage[] | null;
 }
@@ -42,6 +43,7 @@ interface ProductInfoCardProps {
     setQuantity: React.Dispatch<React.SetStateAction<number>>;
     handleAddToCart: () => Promise<void>;
     handleBuyNow: () => void;
+    viewCount: number;
 }
 
 const ProductInfoCard: React.FC<ProductInfoCardProps> = ({
@@ -49,7 +51,8 @@ const ProductInfoCard: React.FC<ProductInfoCardProps> = ({
     quantity,
     setQuantity,
     handleAddToCart,
-    handleBuyNow
+    handleBuyNow,
+    viewCount
 }) => {
     const { t, language } = useLanguage()
     const { isAuthenticated, openLoginModal } = useAuth()
@@ -194,6 +197,12 @@ const ProductInfoCard: React.FC<ProductInfoCardProps> = ({
                 <span className="text-xs font-semibold text-text-secondary border-l border-[#eaddd2] pl-4 uppercase tracking-wider">
                     {t('detail.recycledDesc')}
                 </span>
+            </div>
+
+            <div className="flex items-center gap-2 mb-6 text-xs font-semibold uppercase tracking-wider text-text-secondary/75" aria-label={`${t('products.views')}: ${viewCount.toLocaleString()}`}>
+                <span className="material-symbols-outlined text-base text-primary" aria-hidden="true">visibility</span>
+                <span>{viewCount.toLocaleString()}</span>
+                <span>{t('products.views')}</span>
             </div>
 
             {/* Product Description */}

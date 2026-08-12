@@ -17,6 +17,7 @@ interface Product {
     inStock: boolean
     category: string
     collection: string
+    viewCount: number
 }
 
 const ProductListing: React.FC = () => {
@@ -62,7 +63,8 @@ const ProductListing: React.FC = () => {
             tags: tags,
             inStock: p.isActive !== false,
             category: p.categoryName || 'Decor',
-            collection: p.isPersonalizable ? 'Personalized' : (p.rewardPoints ? 'New Arrivals' : 'Best Sellers')
+            collection: p.isPersonalizable ? 'Personalized' : (p.rewardPoints ? 'New Arrivals' : 'Best Sellers'),
+            viewCount: typeof p.viewCount === 'number' ? p.viewCount : 0
         };
     });
 
@@ -229,6 +231,11 @@ const ProductListing: React.FC = () => {
                                             <span className="card-category">{getCategoryLabel(product.category)}</span>
                                             <h3 className="card-title">{product.title}</h3>
                                             <p className="card-description">{product.description}</p>
+                                            <div className="card-view-count" aria-label={`${t('products.views')}: ${product.viewCount.toLocaleString()}`}>
+                                                <span className="material-symbols-outlined" aria-hidden="true">visibility</span>
+                                                <span>{product.viewCount.toLocaleString()}</span>
+                                                <span>{t('products.views')}</span>
+                                            </div>
                                             <div className="card-footer" onClick={(e) => e.stopPropagation()}>
                                                 <span className="card-price">{product.price > 1000 ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(product.price) : `$${product.price}.00`}</span>
                                                 {product.inStock ? (

@@ -5,6 +5,7 @@ import ProductInfoCard from '@/components/product/ProductInfoCard'
 import { useCart } from '@/context/CartContext'
 import { useAuth } from '@/context/AuthContext'
 import ProductReviews from '@/components/reviews/ProductReviews'
+import { incrementProductView } from '@/services/api/products'
 
 const Model3DViewer = lazy(() => import('@/components/product/Model3DViewer'))
 
@@ -37,6 +38,7 @@ interface DBProduct {
     usageNote?: string | null;
     isPersonalizable?: boolean;
     rewardPoints?: number;
+    viewCount: number;
     model3DUrl?: string | null;
     category?: ProductCategory | null;
     images?: ProductImage[] | null;
@@ -54,10 +56,13 @@ const ProductDetail: React.FC = () => {
     const [dbProduct, setDbProduct] = useState<DBProduct | null>(null)
     const [loading, setLoading] = useState(true)
     const [relatedProducts, setRelatedProducts] = useState<any[]>([])
+    const viewCountedSlugRef = React.useRef<string | null>(null)
 
     useEffect(() => {
         if (!slug) return;
         setLoading(true);
+        setDbProduct(null);
+        viewCountedSlugRef.current = null;
 
         // 1. Fetch Product details by slug
         fetch(`/api/Products/slug/${slug}`)
@@ -97,7 +102,8 @@ const ProductDetail: React.FC = () => {
                         title: p.name,
                         category: (p.categoryName || p.category?.name || 'DECOR').toUpperCase(),
                         price: new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(p.price),
-                        image: p.thumbnailUrl || p.image || (p.images && p.images[0]?.imageUrl) || '/assets/re_cup.png'
+                        image: p.thumbnailUrl || p.image || (p.images && p.images[0]?.imageUrl) || '/assets/re_cup.png',
+                        viewCount: typeof p.viewCount === 'number' ? p.viewCount : 0
                     }));
                 setRelatedProducts(filtered);
             })
@@ -105,7 +111,22 @@ const ProductDetail: React.FC = () => {
                 console.error('Error loading related products:', err);
                 setRelatedProducts([]);
             });
-    }, [slug, language]);
+    }, [slug]);
+
+    useEffect(() => {
+        if (!dbProduct || viewCountedSlugRef.current === dbProduct.slug) return;
+
+        viewCountedSlugRef.current = dbProduct.slug;
+        incrementProductView(dbProduct.id)
+            .then((viewCount) => {
+                setDbProduct((current) => current && current.id === dbProduct.id
+                    ? { ...current, viewCount }
+                    : current);
+            })
+            .catch((error) => {
+                console.error('Error registering product view:', error);
+            });
+    }, [dbProduct]);
 
     const handleAddToCart = async () => {
         if (!dbProduct) return;
@@ -358,6 +379,7 @@ const ProductDetail: React.FC = () => {
                     setQuantity={setQuantity}
                     handleAddToCart={handleAddToCart}
                     handleBuyNow={handleBuyNow}
+                    viewCount={dbProduct.viewCount}
                 />
             </div>
 
@@ -437,10 +459,15 @@ const ProductDetail: React.FC = () => {
                                     <div className="card-img-wrapper">
                                         <img src={p.image} alt={p.title} />
                                     </div>
-                                    <div className="card-content">
-                                        <span className="card-category">{p.category}</span>
-                                        <h3 className="card-title">{p.title}</h3>
-                                        <div className="card-footer">
+                                        <div className="card-content">
+                                            <span className="card-category">{p.category}</span>
+                                            <h3 className="card-title">{p.title}</h3>
+                                            <div className="card-view-count" aria-label={`${t('products.views')}: ${p.viewCount.toLocaleString()}`}>
+                                                <span className="material-symbols-outlined" aria-hidden="true">visibility</span>
+                                                <span>{p.viewCount.toLocaleString()}</span>
+                                                <span>{t('products.views')}</span>
+                                            </div>
+                                            <div className="card-footer">
                                             <span className="card-price" style={{ fontSize: '1rem' }}>{p.price}</span>
                                             <button className="btn-add-to-cart" title={t('detail.addToCart')}>
                                                 <svg viewBox="0 0 24 24">

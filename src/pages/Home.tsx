@@ -21,6 +21,7 @@ const Home: React.FC = () => {
         image: string
         badge?: string
         slug: string
+        viewCount?: number
     }
 
     const [featuredProducts, setFeaturedProducts] = useState<FeaturedProduct[]>([])
@@ -53,7 +54,8 @@ const Home: React.FC = () => {
                             : (p.description || p.shortDescription || 'Bio-recycled coffee grounds product.'),
                         image: p.thumbnailUrl || p.image || (p.images && p.images[0]?.imageUrl) || '/assets/re_cup.png',
                         badge: badge,
-                        slug: p.slug || String(p.id)
+                        slug: p.slug || String(p.id),
+                        viewCount: typeof p.viewCount === 'number' ? p.viewCount : undefined
                     };
                 });
                 setFeaturedProducts(mapped);
@@ -268,6 +270,13 @@ const Home: React.FC = () => {
                                     <span className="card-category">{p.badge || 'LIFESTYLE'}</span>
                                     <h3 className="card-title">{p.title}</h3>
                                     <p className="card-description">{p.description}</p>
+                                    {typeof p.viewCount === 'number' && (
+                                        <div className="card-view-count" aria-label={`${t('products.views')}: ${p.viewCount.toLocaleString()}`}>
+                                            <span className="material-symbols-outlined" aria-hidden="true">visibility</span>
+                                            <span>{p.viewCount.toLocaleString()}</span>
+                                            <span>{t('products.views')}</span>
+                                        </div>
+                                    )}
                                     <div className="card-footer" onClick={(e) => e.stopPropagation()}>
                                         <span className="card-price">{p.price}</span>
                                         <button 
